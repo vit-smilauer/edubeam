@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<!--
+EduBeam session
+saved in version 3.2.0 on 2013-04-18 at 20h:37m:20s
+-->
+<session version="3.2.0">
+	<domain cName="Domain">
+		<materials>
+			<Material alpha="1.2e-05" d="1.0" domain="domain" e="30000000.0" label="DefaultMat"/>
+		</materials>
+		<crossSects>
+			<CrossSection a="0.06" domain="domain" dyz="1.0" h="1.0" iy="0.00045" iz="0.00045" label="DefaultCS"/>
+		</crossSects>
+		<nodes>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[10.0, 0.0, 0.0]" domain="domain" label="24"/>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[7.0, 0.0, 2.0]" domain="domain" label="25"/>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[10.0, 0.0, 2.0]" domain="domain" label="26"/>
+			<Node bcs="{'Y': False, 'x': False, 'z': False}" coords="[-3.5, 0.0, -4.0]" domain="domain" label="27"/>
+			<Node bcs="{'Y': False, 'x': False, 'z': False}" coords="[8.6, 0.0, -4.0]" domain="domain" label="20"/>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[7.0, 0.0, -2.0]" domain="domain" label="21"/>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[10.0, 0.0, -2.0]" domain="domain" label="22"/>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[7.0, 0.0, 0.0]" domain="domain" label="23"/>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[-5.0, 0.0, -4.0]" domain="domain" label="1"/>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[-5.0, 0.0, -2.0]" domain="domain" label="3"/>
+			<Node bcs="{'Y': False, 'x': False, 'z': False}" coords="[-2.0, 0.0, -4.0]" domain="domain" label="2"/>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[-5.0, 0.0, 0.0]" domain="domain" label="5"/>
+			<Node bcs="{'Y': False, 'x': False, 'z': False}" coords="[-2.0, 0.0, -2.0]" domain="domain" label="4"/>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[-5.0, 0.0, 2.0]" domain="domain" label="7"/>
+			<Node bcs="{'Y': False, 'x': False, 'z': False}" coords="[-2.0, 0.0, 0.0]" domain="domain" label="6"/>
+			<Node bcs="{'Y': False, 'x': True, 'z': True}" coords="[1.0, 0.0, -4.0]" domain="domain" label="9"/>
+			<Node bcs="{'Y': False, 'x': False, 'z': False}" coords="[-2.0, 0.0, 2.0]" domain="domain" label="8"/>
+			<Node bcs="{'Y': False, 'x': False, 'z': False}" coords="[2.5, 0.0, -4.0]" domain="domain" label="11"/>
+			<Node bcs="{'Y': False, 'x': False, 'z': True}" coords="[4.0, 0.0, -4.0]" domain="domain" label="10"/>
+			<Node bcs="{'Y': False, 'x': False, 'z': True}" coords="[4.0, 0.0, -2.0]" domain="domain" label="13"/>
+			<Node bcs="{'Y': False, 'x': True, 'z': True}" coords="[1.0, 0.0, -2.0]" domain="domain" label="12"/>
+			<Node bcs="{'Y': False, 'x': False, 'z': True}" coords="[4.0, 0.0, 0.0]" domain="domain" label="15"/>
+			<Node bcs="{'Y': False, 'x': True, 'z': True}" coords="[1.0, 0.0, 0.0]" domain="domain" label="14"/>
+			<Node bcs="{'Y': False, 'x': False, 'z': True}" coords="[4.0, 0.0, 2.0]" domain="domain" label="17"/>
+			<Node bcs="{'Y': False, 'x': True, 'z': True}" coords="[1.0, 0.0, 2.0]" domain="domain" label="16"/>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[10.0, 0.0, -4.0]" domain="domain" label="19"/>
+			<Node bcs="{'Y': True, 'x': True, 'z': True}" coords="[7.0, 0.0, -4.0]" domain="domain" label="18"/>
+		</nodes>
+		<elements>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="11" mat="DefaultMat" nodes="['18', '20']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="10" mat="DefaultMat" nodes="['16', '17']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="13" mat="DefaultMat" nodes="['21', '22']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="12" mat="DefaultMat" nodes="['20', '19']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="15" mat="DefaultMat" nodes="['25', '26']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="14" mat="DefaultMat" nodes="['23', '24']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="1" mat="DefaultMat" nodes="['1', '27']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="3" mat="DefaultMat" nodes="['3', '4']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="2" mat="DefaultMat" nodes="['27', '2']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="5" mat="DefaultMat" nodes="['7', '8']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="4" mat="DefaultMat" nodes="['5', '6']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="7" mat="DefaultMat" nodes="['11', '10']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="6" mat="DefaultMat" nodes="['9', '11']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="9" mat="DefaultMat" nodes="['14', '15']"/>
+			<Beam2d cs="DefaultCS" domain="domain" hinges="[False, False]" label="8" mat="DefaultMat" nodes="['12', '13']"/>
+		</elements>
+		<loadCases>
+			<LoadCase domain="domain" label="Default_loadcase">
+				<NodalLoad label="1" loadCase="Default_loadcase" value="{'fx': 4.0, 'fz': 0.0, 'my': 0.0}" where="27"/>
+				<NodalLoad label="3" loadCase="Default_loadcase" value="{'fx': 4.0, 'fz': 0.0, 'my': 0.0}" where="11"/>
+				<NodalLoad label="2" loadCase="Default_loadcase" value="{'fx': 0.0, 'fz': 4.0, 'my': 0.0}" where="27"/>
+				<NodalLoad label="5" loadCase="Default_loadcase" value="{'fx': 4.0, 'fz': 0.0, 'my': 0.0}" where="20"/>
+				<NodalLoad label="4" loadCase="Default_loadcase" value="{'fx': 0.0, 'fz': 4.0, 'my': 0.0}" where="11"/>
+				<NodalLoad label="6" loadCase="Default_loadcase" value="{'fx': 0.0, 'fz': 4.0, 'my': 0.0}" where="20"/>
+				<ElementLoad label="1" loadCase="Default_loadcase" value="{'fx': 0.0, 'dTc': 0.0, 'fz': 2.0, 'dTg': 0.0}" where="3"/>
+				<ElementLoad label="3" loadCase="Default_loadcase" value="{'fx': 0.0, 'dTc': 0.0, 'fz': 2.0, 'dTg': 0.0}" where="13"/>
+				<ElementLoad label="2" loadCase="Default_loadcase" value="{'fx': 0.0, 'dTc': 0.0, 'fz': 2.0, 'dTg': 0.0}" where="8"/>
+				<ElementLoad label="5" loadCase="Default_loadcase" value="{'fx': 0.0, 'dTc': 5.0, 'fz': 0.0, 'dTg': 5.0}" where="9"/>
+				<ElementLoad label="4" loadCase="Default_loadcase" value="{'fx': 0.0, 'dTc': 5.0, 'fz': 0.0, 'dTg': 5.0}" where="4"/>
+				<ElementLoad label="6" loadCase="Default_loadcase" value="{'fx': 0.0, 'dTc': 0.8, 'fz': 0.0, 'dTg': 5.0}" where="14"/>
+			</LoadCase>
+		</loadCases>
+	</domain>
+</session>
