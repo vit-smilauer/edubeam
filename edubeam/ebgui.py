@@ -144,7 +144,7 @@ def glCircle(x,y,z,r,n=12):
     """draw circle with center x,y,z and radius r as n-polygon"""
     if n<3: n=3
     glBegin(GL_LINE_LOOP)
-    for i in xrange(n):
+    for i in range(n):
         phi = i*2*math.pi/n
         glVertex3f(x+r*math.cos(phi),y,z+r*math.sin(phi))
     glEnd()
@@ -177,7 +177,7 @@ def glArrow(x,y,z,xSize,zSize,w=0.1,h=0.2):
 def glArrowMoment(x,y,z,size,w=0.2,h=0.4,r=0.1,n=9):
     """draw moment arrow with center at x,y,z, radius size and clockwise if size<0, anticlockwise otherwise"""
     glBegin(GL_LINE_STRIP)
-    for i in xrange(n+1):
+    for i in range(n+1):
         angle = (i if size<0 else -i)*math.pi*3/2./n
         glVertex3f(x+size*math.cos(angle),y,z+size*math.sin(angle))
     glEnd()
@@ -758,10 +758,10 @@ class GLFrame(wx.Frame):
         #self.updateLoadCaseChoice()
 
         self.GLinitialized = False
-        attribList = (glcanvas.WX_GL_RGBA, # RGBA
-                      glcanvas.WX_GL_DOUBLEBUFFER, # Double Buffered
-                      glcanvas.WX_GL_DEPTH_SIZE, 24) # 24 bit
-        attribList = () #!!!
+        #attribList = (glcanvas.WX_GL_RGBA, # RGBA
+                      ##glcanvas.WX_GL_DOUBLEBUFFER, # Double Buffered
+                      ##glcanvas.WX_GL_DEPTH_SIZE, 24) # 24 bit
+        attribList = [wx.glcanvas.WX_GL_RGBA]
         
         self.sizer1 = wx.BoxSizer(wx.VERTICAL)
         self.sizer2 = wx.BoxSizer(wx.HORIZONTAL)
@@ -830,7 +830,7 @@ class GLFrame(wx.Frame):
             if canUndo:
                 name += ': ' + session.giveNameOfUndo()
             item = wx.MenuItem(self, wx.NewId(), name )
-            self.AppendItem(item)
+            self.Append(item)
             self.Bind(wx.EVT_MENU, self.parent.undo, item)
             item.Enable(canUndo)
             name = langStr('Redo','Vpřed')
@@ -838,7 +838,7 @@ class GLFrame(wx.Frame):
             if canRedo:
                 name += ': ' + session.giveNameOfRedo()
             item = wx.MenuItem(self, wx.NewId(), name )
-            self.AppendItem(item)
+            self.Append(item)
             self.Bind(wx.EVT_MENU, self.parent.redo, item)
             item.Enable(canRedo)
             self.AppendSeparator()
@@ -848,32 +848,32 @@ class GLFrame(wx.Frame):
             if type is Node:
                 self.label = entity.label
                 item = wx.MenuItem(self, wx.NewId(), langStr('Edit node %s','Editovat uzel %s') % self.label)  
-                self.AppendItem(item)  
+                self.Append(item)  
                 self.Bind(wx.EVT_MENU, self.EditNode, item)  
                 item = wx.MenuItem(self, wx.NewId(), langStr('Add load to node %s','Přidat zatížení k uzlu %s') % self.label)  
-                self.AppendItem(item)  
+                self.Append(item)  
                 self.Bind(wx.EVT_MENU, self.AddNodalLoad, item)  
             if type is Element:
                 self.label = entity.label
                 item = wx.MenuItem(self, wx.NewId(), langStr('Edit element %s','Editovat prvek %s') % self.label)  
-                self.AppendItem(item)  
+                self.Append(item)  
                 self.Bind(wx.EVT_MENU, self.EditElement, item)  
                 item = wx.MenuItem(self, wx.NewId(), langStr('Add element load to element %s','Přidat prvkové zatížení k prvku %s') % self.label)  
-                self.AppendItem(item)  
+                self.Append(item)  
                 self.Bind(wx.EVT_MENU, self.AddElementLoad, item) 
             if type is not None:
                 self.AppendSeparator()
             #
             item = wx.MenuItem(self, wx.NewId(), langStr('Fit all','Zobraz vše'))  
-            self.AppendItem(item)  
+            self.Append(item)  
             self.Bind(wx.EVT_MENU, self.parent.fitAll, item)  
             #
             item = wx.MenuItem(self, wx.NewId(), langStr('Zoom in', 'Zvětši'))  
-            self.AppendItem(item)  
+            self.Append(item)  
             self.Bind(wx.EVT_MENU, self.parent.zoomIn, item)  
             #
             item = wx.MenuItem(self, wx.NewId(), langStr('Zoom out','Zmenši'))  
-            self.AppendItem(item)  
+            self.Append(item)  
             self.Bind(wx.EVT_MENU, self.parent.zoomOut, item)  
 
         def EditNode (self, event):
@@ -1221,10 +1221,22 @@ class GLFrame(wx.Frame):
 
     def processSizeEvent(self, event):
         """Process the resize event."""
-        #if self.canvas.GetContext():
-        if self.canvas:  #!!!
+        # Make sure the frame is shown before calling SetCurrent.
+        if self.GLinitialized and self.glContext:
+            #print('self.GLinitialized', self.GLinitialized)
+            #self.canvas.Draw()
+            size = self.getGLExtents()
+            self.OnReshape(size.width, size.height)
+            #self.Update()
+            #self.Show()
+            self.canvas.SetCurrent(self.glContext) 
+            self.canvas.Show()
+            self.canvas.Update()
+            self.canvas.Refresh(False)
+        
+        #if self.canvas:  #!!!
         #if self.glContext:
-            print('Need to update', self.glContext)
+            #print('Need to update', self.glContext)
             #self.canvas.draw()
             #self.Update()
             #self.Show()
@@ -1233,9 +1245,12 @@ class GLFrame(wx.Frame):
             #self.canvas.Update() 
             #self.canvas.Refresh(False)
             
-            # Make sure the frame is shown before calling SetCurrent.
+           
             #self.Show()
             #self.canvas.SetCurrent()
+            #self.Show()
+            #self.canvas.SetCurrent(glcanvas.GLContext(self.canvas))
+            #self.glContext.SetCurrent(self.canvas)
             ##
             #size = self.getGLExtents()
             #self.OnReshape(size.width, size.height)
@@ -1244,7 +1259,9 @@ class GLFrame(wx.Frame):
 
     def processPaintEvent(self, event):
         """Process the drawing event."""
-        self.canvas.SetCurrent(glcanvas.GLContext(self.canvas))
+        #print('processPaintEvent', self.GLinitialized)
+        #if not self.GLinitialized: #calling SetCurrent here leads to a frozen canvaz window
+            #self.canvas.SetCurrent(glcanvas.GLContext(self.canvas))
         try:
             glDrawBuffer(GL_BACK);#Windows-related problem of zeros in GL_BACK
         except:
@@ -1439,7 +1456,7 @@ class GLFrame(wx.Frame):
         
     def updateLoadCaseChoice(self):
         self.loadCaseChoice.Clear()
-        self.loadCaseChoice.AppendItems([key for key in sorted(session.domain.loadCases.iterkeys())])
+        self.loadCaseChoice.Append(sorted([*session.domain.loadCases]))
         self.loadCaseChoice.SetValue( session.domain.activeLoadCase.label if session.domain.activeLoadCase else '' )
        
     def checkSolve(self, event):
@@ -1534,7 +1551,7 @@ class GLFrame(wx.Frame):
         wcd = langStr('Xml files (*.xml)|*.xml;*.XML;*.Xml|Oofem files (*.oofem)|*.oofem;*.OOFEM;*.Oofem|All files (*)|*', 'Xml soubory (*.xml)|*.xml;*.XML;*.Xml|Oofem soubory (*.oofem)|*.oofem;*.OOFEM;*.Oofem|Všechny soubory (*)|*')
         dir = os.getcwd()
         open_dlg = wx.FileDialog(self, message=langStr('Choose a file', 'Vyber soubor'), defaultDir=dir, defaultFile='',
-                                 wildcard=wcd, style=wx.OPEN|wx.CHANGE_DIR)
+                                 wildcard=wcd, style=wx.FD_OPEN|wx.FD_CHANGE_DIR)
         if open_dlg.ShowModal() == wx.ID_OK:
             path = open_dlg.GetPath()
             try:
@@ -1564,7 +1581,7 @@ class GLFrame(wx.Frame):
         wcd = langStr('Xml files (*.xml)|*.xml;*.XML;*.Xml|Oofem files (*.oofem)|*.oofem;*.OOFEM;*.Oofem|All files (*)|*', 'Xml soubory (*.xml)|*.xml;*.XML;*.Xml|Oofem soubory (*.oofem)|*.oofem;*.OOFEM;*.Oofem|Všechny soubory (*)|*')
         dir = os.getcwd()
         open_dlg = wx.FileDialog(self, message=langStr('Enter a file for saving', 'Zadej soubor pro uložení'), defaultDir=dir, defaultFile='',
-                                 wildcard=wcd, style=wx.SAVE|wx.CHANGE_DIR)
+                                 wildcard=wcd, style=wx.FD_SAVE|wx.FD_CHANGE_DIR)
         if open_dlg.ShowModal() == wx.ID_OK:
             path = open_dlg.GetPath()
             if open_dlg.GetFilterIndex() == 0: # chosen xml
@@ -1596,7 +1613,7 @@ class GLFrame(wx.Frame):
         wcd = langStr('png files (*.png)|*.png|All files (*)|*', 'png soubory (*.png)|*.png|Všechny soubory (*)|*')
         dir = os.getcwd()
         open_dlg = wx.FileDialog(self, message=langStr('Choose a file', 'Vyber soubor'), defaultDir=dir, defaultFile='',
-                                 wildcard=wcd, style=wx.SAVE|wx.CHANGE_DIR)
+                                 wildcard=wcd, style=wx.FD_SAVE|wx.FD_CHANGE_DIR)
         if open_dlg.ShowModal() == wx.ID_OK:
             path = open_dlg.GetPath()
             if not path.endswith('.png'):
@@ -1755,6 +1772,7 @@ class GLFrame(wx.Frame):
 
     def OnInitGL(self):
         """Initialize OpenGL for use in the window."""
+        #print('self.IsShownOnScreen', self.IsShownOnScreen())
         if wx.MAJOR_VERSION >= 3:
             self.canvas.SetCurrent(self.glContext)
         glClearColor(1, 1, 1, 1)
@@ -1943,7 +1961,7 @@ class GLFrame(wx.Frame):
 
     def OnAboutBox(self, event):
         #
-        info = wx.AboutDialogInfo()
+        info = wx.adv.AboutDialogInfo()
         #
         #info.SetIcon(wx.Icon('icons/hunter.png', wx.BITMAP_TYPE_PNG))
         info.SetName('EduBeam')
@@ -1959,7 +1977,7 @@ class GLFrame(wx.Frame):
         #info.AddArtist('The Tango crew')
         #info.AddTranslator('Borek Patzak')
         #
-        wx.AboutBox(info)
+        wx.adv.AboutBox(info)
 
     def undo(self, event):
         self.resetPreview()
@@ -2034,22 +2052,22 @@ class MaterialBox(wx.Panel):
             self.e.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
             self.g.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
             self.alpha.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
+            btn.Bind(wx.EVT_BUTTON, self.OnAdd)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnAdd)
         elif mode=='edit':
             btn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
             self.e.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             self.g.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             self.alpha.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnChange)
+            btn.Bind(wx.EVT_BUTTON, self.OnChange)
         elif mode=='del':
             btn = wx.Button(self, 1, langStr('&Delete', 'Smazat (&d)'), btPos1, btSize1)
+            btn.Bind(wx.EVT_BUTTON, self.OnDel)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnDel)
-        #
-        wx.Button(self, 2, langStr('&Close', 'Zavři (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavři (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove=None
 
     def enable(self, show=True):
@@ -2179,7 +2197,7 @@ class CrossSectBox(wx.Panel):
         #
         if mode=='add':
             btn = wx.Button(self, 1, langStr('&Add', 'Přidat (&a)'), btPos1, btSize1)
-            wx.EVT_BUTTON(self, 1, self.OnAdd)
+            btn.Bind(wx.EVT_BUTTON, self.OnAdd)
             self.a.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
             self.iy.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
             self.h.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
@@ -2192,13 +2210,13 @@ class CrossSectBox(wx.Panel):
             self.h.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             self.k.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnChange)
+            btn.Bind(wx.EVT_BUTTON, self.OnChange)
         elif mode=='del':
             btn = wx.Button(self, 1, langStr('&Delete', 'Smazat (&d)'), btPos1, btSize1)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnDel)
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+            btn.Bind(wx.EVT_BUTTON, self.OnDel)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove = None
 
     def enable(self, show=True):
@@ -2335,25 +2353,25 @@ class NodeBox(wx.Panel):
 
         if mode=='add':
             self.addBtn = wx.Button(self, 1, langStr('&Add', 'Přidat (&a)'), btPos1, btSize1)
-            wx.EVT_BUTTON(self, 1, self.OnAdd)
             self.xc.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
             self.zc.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
             self.xc.Bind(wx.EVT_KEY_UP, self.preview)
             self.zc.Bind(wx.EVT_KEY_UP, self.preview)
+            self.addBtn.Bind(wx.EVT_BUTTON, self.OnAdd)
             self.addBtn.SetFocus()
         elif mode=='edit':
             btn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
-            wx.EVT_BUTTON(self, 1, self.OnChange)
             self.xc.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             self.zc.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
+            btn.Bind(wx.EVT_BUTTON, self.OnChange)
             btn.SetFocus()
         elif mode=='del':
             btn = wx.Button(self, 1, langStr('&Delete', 'Smazat (&d)'), btPos1, btSize1)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnDel)
+            btn.Bind(wx.EVT_BUTTON, self.OnDel)
 
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove = None
 
     def preview(self,event=None):
@@ -2619,19 +2637,19 @@ class ElemBox(wx.Panel):
             self.parent.updateCombo(self.comboN1, session.domain.nodes, 'first')
             self.parent.updateCombo(self.comboN2, session.domain.nodes, 'last')
             btn = wx.Button(self, 1, langStr('&Add', 'Přidat (&a)'), btPos1, btSize1)
-            wx.EVT_BUTTON(self, 1, self.OnAdd)
+            btn.Bind(wx.EVT_BUTTON, self.OnAdd)
             btn.SetFocus()
         elif mode=='edit':
             btn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnChange)
+            btn.Bind(wx.EVT_BUTTON, self.OnChange)
         elif mode=='del':
             btn = wx.Button(self, 1, langStr('&Delete', 'Smazat (&d)'), btPos1, btSize1)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnDel)
+            btn.Bind(wx.EVT_BUTTON, self.OnDel)
         #
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove=None
 
     def preview(self,event=None):
@@ -2857,18 +2875,19 @@ class LoadCaseBox(wx.Panel):
         if mode=='add':
             btn = wx.Button(self, 1, langStr('&Add', 'Přidat (&a)'), btPos1, btSize1)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnAdd)
+            btn.Bind(wx.EVT_BUTTON, self.OnAdd)
         elif mode=='edit':
             btn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnChange)
+            btn.Bind(wx.EVT_BUTTON, self.OnChange)
+            
         elif mode=='del':
             btn = wx.Button(self, 1, langStr('&Delete', 'Smazat (&d)'), btPos1, btSize1)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnDel)
+            btn.Bind(wx.EVT_BUTTON, self.OnDel)
         
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove = None
 
     def enable(self, show=True):
@@ -3004,20 +3023,20 @@ class NodalLoadBox(wx.Panel):
             self.fz.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
             self.my.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnAdd)
+            btn.Bind(wx.EVT_BUTTON, self.OnAdd)
         elif mode=='edit':
             btn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
             self.fx.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             self.fz.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             self.my.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnChange)
+            btn.Bind(wx.EVT_BUTTON, self.OnChange)
         elif mode=='del':
             btn = wx.Button(self, 1, langStr('&Delete', 'Smazat (&d)'), btPos1, btSize1)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnDel)
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+            btn.Bind(wx.EVT_BUTTON, self.OnDel)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove = None
 
     def enable(self, show=True):
@@ -3257,21 +3276,21 @@ class PrescribedDsplBox(wx.Panel):
             self.uz.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
             self.phiy.Bind(wx.EVT_TEXT_ENTER, self.OnAdd)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnAdd)
+            btn.Bind(wx.EVT_BUTTON, self.OnAdd)
         elif mode=='edit':
             btn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
             self.ux.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             self.uz.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             self.phiy.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnChange)
+            btn.Bind(wx.EVT_BUTTON, self.OnChange)
         elif mode=='del':
             btn = wx.Button(self, 1, langStr('&Delete', 'Smazat (&d)'), btPos1, btSize1)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnDel)
+            btn.Bind(wx.EVT_BUTTON, self.OnDel)
         #
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove = None
 
     def enable(self, show=True):
@@ -3463,7 +3482,7 @@ class ElementLoadBox(wx.Panel):
         if mode=='add':
             btn = wx.Button(self, 1, langStr('&Add', 'Přidat (&a)'), btPos1, btSize1)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnAdd)
+            btn.Bind(wx.EVT_BUTTON, self.OnAdd)
         elif mode=='edit':
             btn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
             #self.fx.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
@@ -3471,14 +3490,14 @@ class ElementLoadBox(wx.Panel):
             #self.dTc.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             #self.dTg.Bind(wx.EVT_TEXT_ENTER, self.OnChange)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnChange)
+            btn.Bind(wx.EVT_BUTTON, self.OnChange)
         elif mode=='del':
             btn = wx.Button(self, 1, langStr('&Delete', 'Smazat (&d)'), btPos1, btSize1)
             btn.SetFocus()
-            wx.EVT_BUTTON(self, 1, self.OnDel)
+            btn.Bind(wx.EVT_BUTTON, self.OnDel)
 
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove = None
         
 
@@ -3796,11 +3815,11 @@ class TransformMeshBox(wx.Panel):
         self.dz = wx.TextCtrl(self, -1, '0.0',  (xx3, zz+3*dz-10), (90, -1),style=wx.TE_PROCESS_ENTER)
 
         # bottom buttons
-        btn = wx.Button(self, 1, langStr('Apply', 'Proveď'), btPos1, btSize1)
-        wx.EVT_BUTTON(self, 1, self.OnApply)
-        btn.SetFocus()
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+        applyBtn = wx.Button(self, 1, langStr('Apply', 'Proveď'), btPos1, btSize1)
+        applyBtn.Bind(wx.EVT_BUTTON, self.OnApply)
+        applyBtn.SetFocus()
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove = None
         #
         #self.defScaleSlider = wx.Slider(self, -1, 50, 0, 100, (20, 140), (110, -1))
@@ -3871,16 +3890,19 @@ class ModifyNodesBox(wx.Panel):
         zz += 20
         self.bcr = CheckBoxWithHelp(self,wx.NewId(),'r', (10,zz), help=self.helpBcRotY)
         
-        btn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), (10, minHeight-80), btSize1)
-        wx.EVT_BUTTON(self, 1, self.OnChange)
-        btn.SetFocus()
+        changeBtn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), (10, minHeight-80), btSize1)
+        #wx.EVT_BUTTON(self, 1, self.OnChange)
+        changeBtn.Bind(wx.EVT_BUTTON, self.OnChange)
+        changeBtn.SetFocus()
 
-        btn = wx.Button(self, 2, langStr('&Delete', 'Smazat (&d)'), (110, minHeight-80), btSize1)
-        btn.SetFocus()
-        wx.EVT_BUTTON(self, 2, self.OnDel)
+        btnDel = wx.Button(self, 2, langStr('&Delete', 'Smazat (&d)'), (110, minHeight-80), btSize1)
+        btnDel.SetFocus()
+        btnDel.Bind(wx.EVT_BUTTON, self.OnDel)
+        #wx.EVT_BUTTON(self, 2, self.OnDel)
 
-        wx.Button(self, 3, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 3, self.OnClose)
+        closeBtn = wx.Button(self, 3, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
+        #wx.EVT_BUTTON(self, 3, self.OnClose)
         self.onmousemove = None
 
     def enable(self, show=True):
@@ -3953,15 +3975,15 @@ class LinearStaticPostProcessBox(wx.Panel):
         xx1,xx2,xx3,zz,dz = 5,10,100,20,20
         # what to draw
         self.defGeoCB = wx.CheckBox(self, -1, langStr('Deformed geometry', 'Deformovaný tvar'), (xx2, zz))
-        wx.EVT_CHECKBOX(self, self.defGeoCB.GetId(), self.defGeo)
+        self.Bind(wx.EVT_CHECKBOX, self.defGeo, self.defGeoCB)
         self.NCB = wx.CheckBox(self, -1, langStr('Normal force', 'Normálová síla'), (xx2, zz+1*dz))
-        wx.EVT_CHECKBOX(self, self.NCB.GetId(), self.NDraw)
+        self.Bind(wx.EVT_CHECKBOX, self.NDraw, self.NCB)
         self.VCB = wx.CheckBox(self, -1, langStr('Shear Force', 'Posouvající síla'), (xx2, zz+2*dz))
-        wx.EVT_CHECKBOX(self, self.VCB.GetId(), self.VDraw)
+        self.Bind(wx.EVT_CHECKBOX, self.VDraw, self.VCB)
         self.MCB = wx.CheckBox(self, -1, langStr('Moment', 'Moment'), (xx2, zz+3*dz))
-        wx.EVT_CHECKBOX(self, self.MCB.GetId(), self.MDraw)
+        self.Bind(wx.EVT_CHECKBOX, self.MDraw, self.MCB)
         self.RCB = wx.CheckBox(self, -1, langStr('Reactions', 'Reakce'), (xx2, zz+4*dz))
-        wx.EVT_CHECKBOX(self, self.RCB.GetId(), self.RDraw)
+        self.Bind(wx.EVT_CHECKBOX, self.RDraw, self.RCB)
         # scales
         zz += 110
         dz = 30
@@ -3973,7 +3995,8 @@ class LinearStaticPostProcessBox(wx.Panel):
         self.intForces = wx.TextCtrl(self, -1, '1.0',  (xx3, zz+2*dz-10), (90, -1),style=wx.TE_PROCESS_ENTER)
         self.Bind(wx.EVT_TEXT_ENTER, self.OnSetScale)
         autoscale_btn = wx.Button(self, 3, langStr('&AutoScale', 'Aut. měř. (&a)'), (xx3,zz+3*dz-10), btSize1)
-        wx.EVT_BUTTON(self, 3, self.OnAutoScale)
+        #wx.EVT_BUTTON(self, 3, self.OnAutoScale)
+        self.Bind(wx.EVT_BUTTON, self.OnAutoScale, autoscale_btn)
         # table
         zz += 120
         wx.StaticBox(self, -1, langStr('Table', 'Tabulka'), (xx1,zz), (200, 115))
@@ -3981,15 +4004,18 @@ class LinearStaticPostProcessBox(wx.Panel):
         self.comboDataType.Bind(wx.EVT_COMBOBOX, self.OnChangeCombo1)
         self.combo2 = wx.ComboBox(self, -1, pos=(xx2,zz+2*dz-10), size=(180,-1), style=wx.CB_READONLY)
         self.combo2.Hide()
-        self.ResultsSpreadsheet = wx.Button(self, -1, langStr('Results to spreadsheet', 'Výsledky do tabulky'), (xx2, zz+3*dz-10))
-        wx.EVT_BUTTON(self, self.ResultsSpreadsheet.GetId(), self.ResultsToSpreadsheet)
+        resBtn = wx.Button(self, -1, langStr('Results to spreadsheet', 'Výsledky do tabulky'), (xx2, zz+3*dz-10))
+        #wx.EVT_BUTTON(self, self.ResultsSpreadsheet.GetId(), self.ResultsToSpreadsheet)
+        self.Bind(wx.EVT_BUTTON, self.ResultsToSpreadsheet, resBtn)
 
         # bottom buttons
         btn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
-        wx.EVT_BUTTON(self, 1, self.OnSetScale)
+        #wx.EVT_BUTTON(self, 1, self.OnSetScale)
+        self.Bind(wx.EVT_BUTTON, self.OnSetScale, btn)
         btn.SetFocus()
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
+        
         self.onmousemove = None
         #
         #self.defScaleSlider = wx.Slider(self, -1, 50, 0, 100, (20, 140), (110, -1))
@@ -4090,15 +4116,15 @@ class LinearStaticPostProcessBox(wx.Panel):
             self.parent = parent  
             #
             item = wx.MenuItem(self, wx.NewId(), langStr('Fit all', 'Přizpůsobit oknu'))  
-            self.AppendItem(item)  
+            self.Append(item)  
             self.Bind(wx.EVT_MENU, self.fitAll, item)  
             #
             item = wx.MenuItem(self, wx.NewId(), langStr('Zoom in', 'Zvětši'))  
-            self.AppendItem(item)  
+            self.Append(item)  
             self.Bind(wx.EVT_MENU, self.zoomIn, item)  
             #
             item = wx.MenuItem(self, wx.NewId(), langStr('Zoom out', 'Zmenši'))  
-            self.AppendItem(item)  
+            self.Append(item)  
             self.Bind(wx.EVT_MENU, self.zoomOut, item)  
             #
             def fitAll(self, event):  
@@ -4162,8 +4188,8 @@ class LinearStabilityPostProcessBox(wx.Panel):
         btn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
         wx.EVT_BUTTON(self, 1, self.OnSetScale)
         btn.SetFocus()
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove = None
         #
         #self.defScaleSlider = wx.Slider(self, -1, 50, 0, 100, (20, 140), (110, -1))
@@ -4240,15 +4266,15 @@ class LinearStabilityPostProcessBox(wx.Panel):
             self.parent = parent  
             #
             item = wx.MenuItem(self, wx.NewId(), langStr('Fit all', 'Přizpůsobit oknu'))  
-            self.AppendItem(item)  
+            self.Append(item)  
             self.Bind(wx.EVT_MENU, self.fitAll, item)  
             #
             item = wx.MenuItem(self, wx.NewId(), langStr('Zoom in', 'Zvětši'))  
-            self.AppendItem(item)  
+            self.Append(item)  
             self.Bind(wx.EVT_MENU, self.zoomIn, item)  
             #
             item = wx.MenuItem(self, wx.NewId(), langStr('Zoom out', 'Zmenši'))  
-            self.AppendItem(item)  
+            self.Append(item)  
             self.Bind(wx.EVT_MENU, self.zoomOut, item)  
             #
             def fitAll(self, event):  
@@ -4299,8 +4325,8 @@ class SelectSolverBox(wx.Panel):
         ##HideStabilityOptions()
         
         # bottom buttons
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove = None
         #
         #self.defScaleSlider = wx.Slider(self, -1, 50, 0, 100, (20, 140), (110, -1))
@@ -4389,14 +4415,18 @@ class ScaleBox(wx.Panel):
         self.Bind(wx.EVT_CHECKBOX, self.glframe.toggleUniLoadSize)
 
         autoscale_btn = wx.Button(self, 1, langStr('&AutoScale', '&Auto. měř.'), (10,300), (btSize1[0]-10,btSize1[1]) )
-        wx.EVT_BUTTON(self, 1, self.glframe.autoScale)
-        wx.Button(self, 3, langStr('&Default', 'Výchozí (&d)'), (100,300), btSize1)
-        wx.EVT_BUTTON(self, 3, self.OnDefault)
-        btn = wx.Button(self, 2, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
-        wx.EVT_BUTTON(self, 2, self.OnSetScale)
-        btn.SetFocus()
-        wx.Button(self, 3, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 3, self.OnClose)
+        #wx.EVT_BUTTON(self, 1, self.glframe.autoScale)
+        self.Bind(wx.EVT_BUTTON, self.glframe.autoScale, autoscale_btn)
+        defBtn = wx.Button(self, 3, langStr('&Default', 'Výchozí (&d)'), (100,300), btSize1)
+        #wx.EVT_BUTTON(self, 3, self.OnDefault)
+        self.Bind(wx.EVT_BUTTON, self.OnDefault, defBtn)
+        changeBtn = wx.Button(self, 2, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
+        #wx.EVT_BUTTON(self, 2, self.OnSetScale)
+        self.Bind(wx.EVT_BUTTON, self.OnSetScale, changeBtn)
+        changeBtn.SetFocus()
+        closeBtn = wx.Button(self, 3, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        #wx.EVT_BUTTON(self, 3, self.OnClose)
+        self.Bind(wx.EVT_BUTTON, self.OnClose, closeBtn)
         self.onmousemove = None
 
     def enable(self, show=True):
@@ -4451,19 +4481,23 @@ class PythonBox(wx.Panel):
         self.commandText = wx.TextCtrl(self, -1, '', (10,40), (160,160),style=wx.TE_MULTILINE)
         #
         execBtn = wx.Button(self, 2, langStr('Exec', 'Exec'), (btPos1[0],btPos1[1]-33), btSize1)
-        wx.EVT_BUTTON(self, 2, self.execCommand)
+        #wx.EVT_BUTTON(self, 2, self.execCommand)
+        self.Bind(wx.EVT_BUTTON, self.execCommand, execBtn)
         execBtn.SetFocus()
         #
         shellBtn = wx.Button(self, 3, langStr('Shell', 'Shell'), (btPos2[0],btPos2[1]-33), btSize1)
-        wx.EVT_BUTTON(self, 3, self.launchPythonShell)
+        #wx.EVT_BUTTON(self, 3, self.launchPythonShell)
+        self.Bind(wx.EVT_BUTTON, self.launchPythonShell, shellBtn)
         shellBtn.SetFocus()
         #
         evalBtn = wx.Button(self, 1, langStr('Eval', 'Eval'), btPos1, btSize1)
-        wx.EVT_BUTTON(self, 1, self.evalCommand)
+        #wx.EVT_BUTTON(self, 1, self.evalCommand)
+        self.Bind(wx.EVT_BUTTON, self.evalCommand, evalBtn)
         evalBtn.SetFocus()
         #
-        wx.Button(self, 4, langStr('&Close', 'Zavři (&c)'), btPos2, btSize1)
-        wx.EVT_BUTTON(self, 4, self.OnClose)
+        closeBtn = wx.Button(self, 4, langStr('&Close', 'Zavři (&c)'), btPos2, btSize1)
+        #wx.EVT_BUTTON(self, 4, self.OnClose)
+        self.Bind(wx.EVT_BUTTON, self.OnClose, closeBtn)
 
     def launchPythonShell(self, event):
         try:
@@ -4522,14 +4556,16 @@ class GridBox(wx.Panel):
         self.gs.Bind(wx.EVT_TEXT_ENTER, self.OnSetGrid)
         #
         set_btn = wx.Button(self, 1, langStr('Chan&ge', 'Změnit (&g)'), btPos1, btSize1)
-        wx.EVT_BUTTON(self, 1, self.OnSetGrid)
+        #wx.EVT_BUTTON(self, 1, self.OnSetGrid)
+        self.Bind(wx.EVT_BUTTON, self.OnSetGrid, set_btn)
         set_btn.SetFocus()
-        wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavřít (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove = None
         #
-        wx.Button(self, 3, langStr('&Default', 'Výchozí (&d)'), (100,180), btSize1)
-        wx.EVT_BUTTON(self, 3, self.OnDefault)
+        defBtn = wx.Button(self, 3, langStr('&Default', 'Výchozí (&d)'), (100,180), btSize1)
+        #wx.EVT_BUTTON(self, 3, self.OnDefault)
+        self.Bind(wx.EVT_BUTTON, self.OnDefault, defBtn)
         #
         if None:
             # nice automatic layout setup using box sizers, but works only in Linux
@@ -4566,10 +4602,11 @@ class GridBox(wx.Panel):
             set_btn = wx.Button(self, 1, langStr('Set', 'Nastav'))
             wx.EVT_BUTTON(self, 1, self.OnSetGrid)
             #set_btn.SetFocus()
-            cls_btn=wx.Button(self, 2, langStr('&Close', 'Zavři (&c)'))
-            wx.EVT_BUTTON(self, 2, self.OnClose)
+            closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavři (&c)'))
+            closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
+            
             hbox.Add(set_btn)
-            hbox.Add(cls_btn)
+            hbox.Add(closeBtn)
         
             boxsizer.Add(hbox, border=10)
             self.SetSizer(boxsizer)
@@ -4684,38 +4721,38 @@ class Notebook(wx.Frame):
         self.k.SetFocus()
         # k
         self.k.SetCellValue(0,0, 'dof/dof')
-        for col in xrange(nu):
+        for col in range(nu):
             self.k.SetCellValue(0, col+1, str(col)+', u, '+session.solver.dofNames[col])
-        for col in xrange(np):
+        for col in range(np):
             self.k.SetCellValue(0, col+1+nu, str(col+nu)+', p, '+session.solver.dofNames[col+nu])
-        for row in xrange(nu):
+        for row in range(nu):
             self.k.SetCellValue(row+1, 0, str(row)+', u, '+session.solver.dofNames[row])
-            for col in xrange(nu):
+            for col in range(nu):
                 self.k.SetCellValue(row+1, col+1, '%g'%kuu[row,col] )
-            for col in xrange(np):
+            for col in range(np):
                 self.k.SetCellValue(row+1, col+1+nu, '%g'%kup[row,col] )
-        for row in xrange(np):
+        for row in range(np):
             self.k.SetCellValue(row+1+nu, 0, str(row+nu)+', p, '+session.solver.dofNames[row+nu])
-            for col in xrange(nu):
+            for col in range(nu):
                 self.k.SetCellValue(row+1+nu, col+1, '%g'%kup[col,row] )
-            for col in xrange(np):
+            for col in range(np):
                 self.k.SetCellValue(row+1+nu, col+1+nu, '%g'%kpp[row,col] )
         # r
         self.r.SetCellValue(0,0, 'dof')
         self.r.SetCellValue(0,1, 'value')
-        for row in xrange(nu):
+        for row in range(nu):
             self.r.SetCellValue(row+1, 0, str(row)+', u, '+session.solver.dofNames[row])
             self.r.SetCellValue(row+1, 1, '%g'%r[row] )
-        for row in xrange(np):
+        for row in range(np):
             self.r.SetCellValue(row+1+nu, 0, str(row+nu)+', p, '+session.solver.dofNames[row+nu])
             self.r.SetCellValue(row+1+nu, 1, '%g'%r[row+nu] )
         # f
         self.f.SetCellValue(0,0, 'dof')
         self.f.SetCellValue(0,1, 'value')
-        for row in xrange(nu):
+        for row in range(nu):
             self.f.SetCellValue(row+1, 0, str(row)+', u, '+session.solver.dofNames[row])
             self.f.SetCellValue(row+1, 1, '%g'%f[row] )
-        for row in xrange(np):
+        for row in range(np):
             self.f.SetCellValue(row+1+nu, 0, str(row+nu)+', p, '+session.solver.dofNames[row+nu])
             self.f.SetCellValue(row+1+nu, 1, '%g'%f[row+nu] )
 
@@ -4745,18 +4782,18 @@ class Notebook(wx.Frame):
         self.nb.AddPage(self.f, langStr('End forces (local)', 'Koncové síly (lokální)'))
         self.kl.SetFocus()
         # kl
-        for row in xrange(6):
-            for col in xrange(6):
+        for row in range(6):
+            for col in range(6):
                 self.kl.SetCellValue(row, col, '%g'%kl[row,col] )
         # kg
-        for row in xrange(6):
-            for col in xrange(6):
+        for row in range(6):
+            for col in range(6):
                 self.kg.SetCellValue(row, col, '%g'%kg[row,col] )
         # r
-        for row in xrange(6):
+        for row in range(6):
             self.r.SetCellValue(row, 0, '%g'%r[row] )
         # f
-        for row in xrange(6):
+        for row in range(6):
             self.f.SetCellValue(row, 0, '%g'%f[row] )
 
     def importData_linStatResults(self):
@@ -4771,7 +4808,7 @@ class Notebook(wx.Frame):
         self.Nodes.SetFocus()
         # nodes
         header = [langStr('Node', 'Uzel') , 'x [~m]' , 'y [~m]' , 'z [~m]' , 'u [~m]' , 'w [~m]' , 'phi [~rad]', 'Rx [~N]', 'Rz [~N]' , 'Rm [~Nm]']
-        for i in xrange(0,len(header)):
+        for i in range(0,len(header)):
             self.Nodes.SetCellValue(0,i, header[i])
         r = session.solver.r[session.domain.activeLoadCase.label]
         f = session.solver.f[session.domain.activeLoadCase.label]
@@ -4790,12 +4827,12 @@ class Notebook(wx.Frame):
             data.append( ('{0:.8g}'.format(f[n.loc[0]])) if n.hasPrescribedBcInDof(0) else '-'  )
             data.append( ('{0:.8g}'.format(f[n.loc[1]])) if n.hasPrescribedBcInDof(1) else '-'  )
             data.append( ('{0:.8g}'.format(f[n.loc[2]])) if n.hasPrescribedBcInDof(2) else '-'  )
-            for i in xrange(0,len(data)):
+            for i in range(0,len(data)):
                 self.Nodes.SetCellValue(row, i, data[i])
             row = row + 1
         # elements
         header = [langStr('Element', 'Prvek') , '(a-b)' , 'u_a^l [~m]' , 'w_a^l [~m]' , 'phi_a [~rad]' , 'u_b^l [~m]' , 'w_b^l [~m]', 'phi_b [~rad]', 'X_a^l [~N]' , 'Z_a^l [~N]', 'M_a [~Nm]' , 'X_b^l [~N]' , 'Z_b^l [~N]' , 'M_b [~Nm]' , 'N [~N]']
-        for i in xrange(0,len(header)):
+        for i in range(0,len(header)):
             self.Elements.SetCellValue(0,i, header[i])
         row = 1
         sortedElems = sorted(session.domain.elements.values(), key=lambda n: natural_key(n.label))
@@ -4817,7 +4854,7 @@ class Notebook(wx.Frame):
             data.append('{0:.8g}'.format(l[4]))
             data.append('{0:.8g}'.format(l[5]))
             data.append( ('{0:.8g}'.format(l[3])) if abs(l[0]+l[3])<1.e-8 else '-')#only when constant normal force
-            for i in xrange(0,len(data)):
+            for i in range(0,len(data)):
                 self.Elements.SetCellValue(row, i, data[i])
             row = row + 1
 
@@ -4831,7 +4868,7 @@ class Notebook(wx.Frame):
             wcd = langStr('Csv files (*.csv)|*.csv;*.CSV;*.Csv|All files (*)|*', 'Csv soubory (*.csv)|*.csv;*.CSV;*.Csv|Všechny soubory (*)|*')
         dir = os.getcwd()
         open_dlg = wx.FileDialog(self, message=langStr('Enter a file for saving', 'Zadej soubor pro uložení'), defaultDir=dir, defaultFile='',
-                                 wildcard=wcd, style=wx.SAVE|wx.CHANGE_DIR)
+                                 wildcard=wcd, style=wx.FD_SAVE|wx.FD_CHANGE_DIR)
         if open_dlg.ShowModal() == wx.ID_OK:
             path = open_dlg.GetPath()
             if open_dlg.GetFilterIndex() == 0:
@@ -4902,11 +4939,11 @@ class ColorSetupBox(wx.Panel):
         self.previewColorBtn.SetBackgroundColour([c*255 for c in globalSettings.previewColor])
         self.previewColorBtn.Bind(wx.EVT_BUTTON, self.selectPreviewColor)
         #
-        wx.Button(self, 3, langStr('&Default', 'Výchozí (&d)'), btPos1, btSize1)
-        wx.EVT_BUTTON(self, 3, self.OnDefault)
-        wx.Button(self, 2, langStr('&Close', 'Zavři (&c)'), btPos2, btSize2)
-        wx.EVT_BUTTON(self, 2, self.OnClose)
-        #
+        defBtn = wx.Button(self, 3, langStr('&Default', 'Výchozí (&d)'), btPos1, btSize1)
+        #wx.EVT_BUTTON(self, 3, self.OnDefault)
+        self.Bind(wx.EVT_BUTTON, self.OnDefault, defBtn)
+        closeBtn = wx.Button(self, 2, langStr('&Close', 'Zavři (&c)'), btPos2, btSize2)
+        closeBtn.Bind(wx.EVT_BUTTON, self.OnClose)
         self.onmousemove = None
 
     def enable(self, show=True):
@@ -5252,7 +5289,7 @@ def OnDrawResults(self, rr, nseg=20):
         rl = self.computeEndDspl(rr)
         u,w = self.computeDefl(rl=rl, fzloc=None, geom=(l,dx,dz))
         glBegin(GL_LINE_STRIP )
-        for i in xrange(nseg+1):
+        for i in range(nseg+1):
             xl = float(i)/float(nseg)
             xc = (1.-xl)*c1[0]+xl*c2[0]+(c*u[i]-s*w[i])*float(globalSizesScales.deformationScale)
             zc = (1.-xl)*c1[2]+xl*c2[2]+(s*u[i]+c*w[i])*float(globalSizesScales.deformationScale)
@@ -5282,7 +5319,7 @@ def OnDrawResults(self, rr, nseg=20):
         glBegin(GL_LINE_STRIP )
         glVertex3f (c1[0], c1[1], c1[2])
         distances,N,labelMask = self.computeNormalForce(F=F)
-        for i in xrange(0,len(distances)):
+        for i in range(0,len(distances)):
             xl = distances[i]
             glVertex3f (
                 c1[0]+c*xl+s*N[i]*float(globalSizesScales.intForceScale),
@@ -5293,7 +5330,7 @@ def OnDrawResults(self, rr, nseg=20):
         glVertex3f (c2[0], c2[1], c2[2])
         glEnd()
         if globalFlags.valuesDisplayFlag:
-            for i in xrange(0,len(labelMask)):
+            for i in range(0,len(labelMask)):
                 if labelMask[i]:
                     xl = distances[i]
                     glPrintString (c1[0]+c*xl+s*N[i]*float(globalSizesScales.intForceScale), c1[1], c1[2]+s*xl-c*N[i]*float(globalSizesScales.intForceScale),'{0:.2f}'.format(posZero(N[i])))
@@ -5306,7 +5343,7 @@ def OnDrawResults(self, rr, nseg=20):
         glBegin(GL_LINE_STRIP )
         glVertex3f (c1[0], c1[1], c1[2])
         distances,V,labelMask = self.computeShearForce(F=F)
-        for i in xrange(0,len(distances)):
+        for i in range(0,len(distances)):
             xl = distances[i]
             glVertex3f (
                 c1[0]+c*xl+s*V[i]*float(globalSizesScales.intForceScale),
@@ -5321,7 +5358,7 @@ def OnDrawResults(self, rr, nseg=20):
         #glVertex3f (c2[0], c2[1], c2[2])
         #glEnd()
         if globalFlags.valuesDisplayFlag:
-            for i in xrange(0,len(labelMask)):
+            for i in range(0,len(labelMask)):
                 if labelMask[i]:
                     xl = distances[i]
                     glPrintString (c1[0]+c*xl+s*V[i]*float(globalSizesScales.intForceScale), c1[1], c1[2]+s*xl-c*V[i]*float(globalSizesScales.intForceScale),'{0:.2f}'.format(posZero(V[i])))
@@ -5334,7 +5371,7 @@ def OnDrawResults(self, rr, nseg=20):
         glBegin(GL_LINE_STRIP )
         glVertex3f (c1[0], c1[1], c1[2])
         distances,M = self.computeMoment(F=F, fzloc=None, geom=(l,dx,dz))
-        for i in xrange(0,len(distances)):
+        for i in range(0,len(distances)):
             xl = distances[i]
             glVertex3f (
                 c1[0]+c*xl+s*M[i]*float(globalSizesScales.intForceScale),
@@ -5479,7 +5516,7 @@ def OnDraw(self, useUniformSize=True):
                 if n<2: n=2
                 dx /= float(n)
                 dz /= float(n)
-                for i in xrange(1,n):
+                for i in range(1,n):
                     glArrow(c1[0]+i*dx,c1[1],c1[2]+i*dz,vx,vz)
             if globalFlags.labelDisplayFlag:
                 c = self.where.computeCenter()

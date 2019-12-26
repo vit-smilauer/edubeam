@@ -127,7 +127,11 @@ def saveConfiguration(dicts,fileName='eb.cfg'):
     :param str fileName: named of file to save setup (default is ~/eb.cfg)
     :returns: *(bool)* blablabla bla
     """
-    globalSettings, globalGridSettings, globalSizesScales, globalFlags = dicts
+    globalSettings = {}
+    globalGridSettings  = {}
+    globalSizesScales  = {}
+    globalFlags = {}
+    
     try:
         # http://python-forum.com/pythonforum/viewtopic.php?f=3&t=8190&p=38102
         home = os.getenv('USERPROFILE') or os.getenv('HOME')
@@ -144,22 +148,22 @@ def saveConfiguration(dicts,fileName='eb.cfg'):
             f.write('<settings>\n')
             # globalSettings
             f.write('\t<globalSettings>\n')
-            for key,val in globalSettings.iteritems():
+            for key,val in globalSettings.items():
                 f.write('\t\t<%s val="%s"/>\n'%(key,val))
             f.write('\t</globalSettings>\n')
             # globalGridSettings
             f.write('\t<globalGridSettings>\n')
-            for key,val in globalGridSettings.iteritems():
+            for key,val in globalGridSettings.items():
                 f.write('\t\t<%s val="%s"/>\n'%(key,val))
             f.write('\t</globalGridSettings>\n')
             # globalSizesScales
             f.write('\t<globalSizesScales>\n')
-            for key,val in globalSizesScales.iteritems():
+            for key,val in globalSizesScales.items():
                 f.write('\t\t<%s val="%s"/>\n'%(key,val))
             f.write('\t</globalSizesScales>\n')
             # globalFlags
             f.write('\t<globalFlags>\n')
-            for key,val in globalFlags.iteritems():
+            for key,val in globalFlags.items():
                 f.write('\t\t<%s val="%s"/>\n'%(key,val))
             f.write('\t</globalFlags>\n')
             #
@@ -198,35 +202,41 @@ def xmlStringFromDomain(domain):
         ret = doc.createElement(name)
         parent = parent if parent else doc
         parent.appendChild(ret)
-        for attr,val in attrs.iteritems():
-           #encoding and decoding does not work here for non-ASCII characters. It is necessary to return byte string.
-           ret.setAttribute(smart_str(attr),  smart_str(val))
+        for attr,val in attrs.items():
+           #encoding and decoding does not work here for non-ASCII characters. It is necessary to return a byte string.
+           #print(smart_str(attr), type(smart_str(attr)), smart_str(val), type(smart_str(val)))
+           attrS = smart_str(attr)
+           valS = smart_str(val) 
+           #ret.setAttribute('1', '2')
+           #Need to pass everything as strings, not bytes
+           ret.setAttribute( attrS.decode() if isinstance(attrS, bytes) else attrS, valS.decode() if isinstance(valS, bytes) else valS )
         return ret
-    #
+
     t = time.localtime()
     doc = xml.dom.minidom.Document()
     doc.appendChild(doc.createComment('\nEduBeam session\nsaved in version %s on %04d-%02d-%02d at %02dh:%02dm:%02ds\n'%(version,t[0],t[1],t[2],t[3],t[4],t[5])))
+    
     session = createDomElem('session',{'version':version})
     d = createDomElem('domain',dict(cName=domain.__class__.__name__),parent=session)
     materials = createDomElem('materials',parent=d)
-    for m in domain.materials.itervalues():
+    for m in domain.materials.values():
         createDomElem(m.__class__.__name__,m.dict(),materials)
     crossSects = createDomElem('crossSects',parent=d)
-    for cs in domain.crossSects.itervalues():
+    for cs in domain.crossSects.values():
         createDomElem(cs.__class__.__name__,cs.dict(),crossSects)
     nodes = createDomElem('nodes',parent=d)
-    for n in domain.nodes.itervalues():
+    for n in domain.nodes.values():
         createDomElem(n.__class__.__name__,n.dict(),nodes)
     elements = createDomElem('elements',parent=d)
-    for e in domain.elements.itervalues():
+    for e in domain.elements.values():
         createDomElem(e.__class__.__name__,e.dict(),elements)
     loadCases = createDomElem('loadCases',parent=d)
-    for lc in domain.loadCases.itervalues():
+    for lc in domain.loadCases.values():
         lcDom = createDomElem(lc.__class__.__name__,lc.dict(),loadCases)
         for container in (lc.nodalLoads,lc.elementLoads,lc.prescribedDspls):
-            for val in container.itervalues():
+            for val in container.values():
                 createDomElem(val.__class__.__name__,val.dict(),lcDom)
-    return doc.toprettyxml() # do not use utf-8 as a parameter: encoding='utf-8'
+    return doc.toprettyxml(encoding="utf-8") # do not use utf-8 as a parameter: encoding='utf-8'
 
 
 def loadDomainFromXmlFile(f,newDomain=None):
@@ -254,7 +264,7 @@ def loadDomainFromXmlFile(f,newDomain=None):
     newDomain.delPredefinedItems()
     pDspls = {} # for version 2.2.6
     #
-    # default vaues are for backward compatibility
+    # default values are for backward compatibility
     for m in materials:
         if m.tag == 'Material':
             label = m.get('label')
@@ -345,7 +355,7 @@ def loadDomainFromXmlFile(f,newDomain=None):
                                 value['dTg'] = value.pop('dtt')
                             if 'dTh' in value:
                                 value['dTg'] = value.pop('dTh')
-                            if not value.has_key('type'): # version 3.3.0
+                            if not 'type' in value: # version 3.3.0
                                value['type'] = 'Uniform'
                                value['dir'] = 'Local Z'
                                value['magnitude'] = value['fz']
@@ -419,12 +429,12 @@ def saveNotebook(self, file, fFormat):
         nPages = self.nb.GetPageCount()
         from ebinit import xlwt
         wb = xlwt.Workbook()
-        for i in xrange(nPages):
+        for i in range(nPages):
             page = self.nb.GetPage(i)
             name = self.nb.GetPageText(i)
             sheet = wb.add_sheet(name)
-            for row in xrange(page.GetNumberRows()):
-                for col in xrange(page.GetNumberCols()):
+            for row in range(page.GetNumberRows()):
+                for col in range(page.GetNumberCols()):
                     sheet.write(row, col, page.GetCellValue(row,col) )
         wb.save(file)
     elif fFormat=='csv':
@@ -432,7 +442,7 @@ def saveNotebook(self, file, fFormat):
         nPages = self.nb.GetPageCount()
         page = self.nb.GetCurrentPage()
         pageNb = -1
-        for i in xrange(nPages):
+        for i in range(nPages):
             if self.nb.GetPage(i) is page:
                 pageNb = i
         if pageNb==-1:
@@ -440,7 +450,7 @@ def saveNotebook(self, file, fFormat):
             return
         name = self.nb.GetPageText(pageNb)
         nRows, nCols = page.GetNumberRows(), page.GetNumberCols()
-        data = [ [page.GetCellValue(row,col) for col in xrange(nCols)] for row in xrange(nRows)]
+        data = [ [page.GetCellValue(row,col) for col in range(nCols)] for row in range(nRows)]
         csv.writer(file).writerows(data)
     else:
         raise EduBeamError
@@ -501,7 +511,7 @@ class OofemFileWriter(FileWriter):
                             nbcs[j] = nbc
                             bcs.append(pDspl.value[key])
                             nbc += 1
-                for j in xrange(3):
+                for j in range(3):
                     if nbcs[j]==0 and node.hasPrescribedBcInDof(j):
                         nbcs[j] = 1
                 bcStr += ' %d %d %d'%(nbcs[0],nbcs[1],nbcs[2])
@@ -600,7 +610,7 @@ class OofemFileReader(FileReader):
             if word == string:
                 l = int(self.lineSplit[i+1])
                 ret = []
-                for j in xrange(l):
+                for j in range(l):
                     ret.append(type(self.lineSplit[i+2+j]))
                 return ret
         if default is not None:
@@ -629,7 +639,7 @@ class OofemFileReader(FileReader):
             print('OofemFileReader: unsupported EngngModel')
         nLCs = self.readInt('nsteps')
         nModules = self.readInt('nmodules',0)
-        for i in xrange(nModules):
+        for i in range(nModules):
             self.readLine()
         # domain
         self.readLine()
@@ -655,7 +665,7 @@ class OofemFileReader(FileReader):
         bcPreKws    = {}
         lcKws    = []
         # nodes
-        for i in xrange(nNodes):
+        for i in range(nNodes):
             self.readLine()
             kw = {
                 'label'  : self.readStr('node'),
@@ -665,7 +675,7 @@ class OofemFileReader(FileReader):
             }
             nodeKws.append(kw)
         # elems
-        for i in xrange(nElems):
+        for i in range(nElems):
             self.readLine()
             h = self.readIntArray('dofstocondense',[])
             hinges = [True if 3 in h else False, True if 6 in h else False]
@@ -683,7 +693,7 @@ class OofemFileReader(FileReader):
             }
             elemKws.append(kw)   
         # cross sects
-        for i in xrange(nCSs):
+        for i in range(nCSs):
             self.readLine()
             kw = {
                 'label' : self.readStr('simplecs'),
@@ -693,7 +703,7 @@ class OofemFileReader(FileReader):
             }
             csKws.append(kw)
         # materials
-        for i in xrange(nMats):
+        for i in range(nMats):
             self.readLine()
             label = self.readStr('isole', None)
             if label is None:
@@ -707,7 +717,7 @@ class OofemFileReader(FileReader):
             }
             matKws.append(kw)
         # loads and bcs
-        for i in xrange(nBCs):
+        for i in range(nBCs):
             self.readLine()
             if self.lineSplit[0] == 'boundarycondition':
                 label = self.readStr('boundarycondition')
@@ -744,7 +754,7 @@ class OofemFileReader(FileReader):
             else:
                 raise EduBeamError
                 print('OofemFileReader: unsupported boundary condition (load)')
-        for i in xrange(nLCs):
+        for i in range(nLCs):
             self.readLine()
             label = self.readStr('peakfunction', None)
             if label is None:
@@ -759,7 +769,7 @@ class OofemFileReader(FileReader):
         for node in nodeKws:
             for nLoadLabel in node['loads']:
                 load = nLoadPreKws[nLoadLabel]
-                kw = dict( (key,val) for key,val in load.iteritems() )
+                kw = dict( (key,val) for key,val in load.items() )
                 kw['where'] = node['label']
                 kw['label'] = 'F_%d'%nl
                 nl += 1
@@ -775,7 +785,7 @@ class OofemFileReader(FileReader):
                     'value': dict( (key, bcPreKws[i]['value'] if i!='0' and bcPreKws[i]['loadCase']==lc else 0.) for key,i in zip(('x','z','Y'),node['bcs']) ),
                     'loadCase': lc,
                 }
-                if any(val for val in kw['value'].itervalues()):
+                if any(val for val in kw['value'].values()):
                     bcKws.append(kw)
             node['bcs'] = {'x':bool(int(bcs[0])), 'z':bool(int(bcs[1])), 'Y':bool(int(bcs[2]))}
         # "redistribution" of element loads
@@ -784,7 +794,7 @@ class OofemFileReader(FileReader):
         for elem in elemKws:
             for eLoadLabel in elem['loads']:
                 load = eLoadPreKws[eLoadLabel]
-                kw = dict( (key,val) for key,val in load.iteritems() )
+                kw = dict( (key,val) for key,val in load.items() )
                 kw['where'] = elem['label']
                 kw['label'] = 'L_%d'%nl
                 nl += 1

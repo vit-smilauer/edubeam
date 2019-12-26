@@ -86,7 +86,7 @@ def giveLabel(dictNew, flag=''):
         else:
             return str('')
     if flag == 'first':
-        return dictNew.keys()[0]
+        return list(dictNew)[0]
     if flag == 'last':
             #dictionary items are not in the same order as inserted
             #return max(dictNew.keys())
@@ -374,7 +374,7 @@ class Node:
                     logger.error( langStr('Node %s already exists in the nodes %s', 'Uzel %s existuje v uzlech %s') % ( label, sorted(domain.nodes.keys()) ) )
                     return 1
         self.coords = [float(coord) for coord in coords]                     if coords is not None else self.coords if self.coords is not None else [0., 0., 0.]
-        self.bcs    = dict( (key,bool(val)) for key,val in bcs.iteritems() ) if bcs    is not None else self.bcs    if self.bcs    is not None else {'x':False,'z':False,'Y':False}
+        self.bcs    = dict( (key,bool(val)) for key,val in bcs.items() ) if bcs    is not None else self.bcs    if self.bcs    is not None else {'x':False,'z':False,'Y':False}
         if label!=self.label or domain is not self.domain:
             if self.domain:
                 self.domain.nodes.pop(self.label,None)
@@ -641,9 +641,9 @@ class Beam2d(Element):
             for load in self.domain.giveElementLoadsOnElement(self,onlyActiveLC=True):
                 vxTmp, vzTmp = load.giveFxFzElemProjection(type=self.domain.type)
                 fzloc += -s*vxTmp + c*vzTmp
-        wret = [0. for i in xrange(nseg+1)]
-        uret = [0. for i in xrange(nseg+1)]
-        for i in xrange(nseg+1):
+        wret = [0. for i in range(nseg+1)]
+        uret = [0. for i in range(nseg+1)]
+        for i in range(nseg+1):
             xl = float(i)/float(nseg) #runs 0..1
             # components from end displacements
             wret[i] = (1.0-3.0*xl*xl+2.0*xl*xl*xl)*rl[1]+l*(-xl+2.0*xl*xl-xl*xl*xl)*rl[2]+(3.0*xl*xl-2.0*xl*xl*xl)*rl[4]+l*(xl*xl-xl*xl*xl)*rl[5]
@@ -697,7 +697,7 @@ class Beam2d(Element):
                 
         ret = []
         #Discontinuity where force applied
-        for i in xrange(0, len(distances)):
+        for i in range(0, len(distances)):
             xl = distances[i]
             xl2 = xl*xl
             distances[i] = xl
@@ -737,14 +737,14 @@ class Beam2d(Element):
         labelMask[-1] = 1
         ret = []
         #Linear function
-        for i in xrange(0, len(distances)):
+        for i in range(0, len(distances)):
             ret.append(-F[0]-fxloc*distances[i])
         #Discontinuity where force applied
         for load in self.domain.giveElementLoadsOnElement(self,onlyActiveLC=True):
             if load.value['type'] == 'Force':#Force
                 a=load.value['DistF']   
                 Fxloc = c*load.value['Fx'] + s*load.value['Fz']
-                for i in xrange(0, len(distances)):
+                for i in range(0, len(distances)):
                     if distances[i]==a:
                         labelMask[i] = 1
                         labelMask[i+1] = 1
@@ -781,14 +781,14 @@ class Beam2d(Element):
         labelMask[-1] = 1
         ret = []
         #Linear function
-        for i in xrange(0, len(distances)):
+        for i in range(0, len(distances)):
             ret.append(-F[1]-fzloc*distances[i])
         #Discontinuity where force applied
         for load in self.domain.giveElementLoadsOnElement(self,onlyActiveLC=True):
             if load.value['type'] == 'Force':#Force
                 a=load.value['DistF']   
                 Fzloc = -s*load.value['Fx'] + c*load.value['Fz']
-                for i in xrange(0, len(distances)):
+                for i in range(0, len(distances)):
                     if distances[i]==a:
                         labelMask[i] = 1
                         labelMask[i+1] = 1
@@ -1447,7 +1447,7 @@ class NodalLoad(GeneralBoundaryCondition):
                     logger.error( langStr('Nodal load with label %s already exists in the nodal loads %s', 'Uzlové zatížení se jménem %s již existuje v uzlových zatíženích %s') % ( label, sorted(loadCase.nodalLoads.keys()) ) )
                     return 1
         where = self.giveNewWhere(where) if where else self.where
-        value = dict( (key,float(val)) for key,val in value.iteritems() ) if value else self.value
+        value = dict( (key,float(val)) for key,val in value.items() ) if value else self.value
         if not where or not value:
             return 1
         self.where = where
@@ -1519,7 +1519,7 @@ class PrescribedDisplacement(GeneralBoundaryCondition):
                     logger.error( langStr('Prescribed displacement with label %s already exists in the pDspls %s', 'Předepsané přemístění se jménem %s již existuje v přemístěních %s') % ( label, sorted(loadCase.prescribedDspls.keys()) ) )
                     return 1
         where = self.giveNewWhere(where) if where else self.where
-        value = dict( (key,float(val)) for key,val in value.iteritems() ) if value else self.value
+        value = dict( (key,float(val)) for key,val in value.items() ) if value else self.value
         if not where or not value:
             return 1
         self.where = where
@@ -1587,7 +1587,7 @@ class ElementLoad(GeneralBoundaryCondition):
                     logger.error( langStr('Element load with label %s already exists in the element loads %s', 'Předepsané přemístění se jménem %s již existuje v předepsaných přemístěních %s') % ( label, sorted(loadCase.elementLoads.keys()) ) )
                     return 1
         where = self.giveNewWhere(where) if where else self.where
-        value = dict( (key,val) for key,val in value.iteritems() ) if value else self.value
+        value = dict( (key,val) for key,val in value.items() ) if value else self.value
         if not where or not value:
             return 1
         self.where = where
@@ -1770,13 +1770,13 @@ class LoadCase:
         return 0
 
     def containsNodalLoad(self,load):
-        return load in self.nodalLoads.itervalues()
+        return load in self.nodalLoads.values()
 
     def containsElementLoad(self,load):
-        return load in self.elementLoads.itervalues()
+        return load in self.elementLoads.values()
 
     def containsPrescribedDspl(self,pDspl):
-        return pDspl in self.prescribedDspls.itervalues()
+        return pDspl in self.prescribedDspls.values()
 
     def contains(self,load):
         if self.containsNodalLoad(load):
@@ -2092,7 +2092,7 @@ class Domain:
             else:
                 self.session.addCommands((command,))
         if verbose:
-            logger.info( langStr('Added Node %s: x=%s z=%s','Vložen uzel %s: x=%s z=%s') % (node.label, node.coords[0], node.coords[2]) )
+            logger.info( langStr('Added Node %s: x=%f z=%f','Vložen uzel %s: x=%f z=%f') % (node.label, node.coords[0], node.coords[2]) )
         return node
 
     def addElement(self,element=None,isUndoable=False,verbose=True,masterCommands=None,**kw):
@@ -2326,7 +2326,7 @@ class Domain:
                 commands.append(('change',Domain.changeElement,cmdKw)) # for undoable version
             logger.info( langStr('Material %s deleted and replaced with %s', 'Materiál %s smazán a nahražen %s') % (mat, newMat) )
         else:
-            for elem in self.elements.itervalues():
+            for elem in self.elements.values():
                 if elem.mat is mat:
                     logger.error( langStr('Material %s is being used by element %s, deleting canceled','Materiál %s je používán prvkem %s, mazání zrušeno') % (mat.label, elem.label ) )
                     return 1
@@ -2365,7 +2365,7 @@ class Domain:
                 commands.append(('change',Domain.changeElement,cmdKw)) # for undoable version
             logger.info( langStr('CrossSection %s deleted and replaced with %s', 'Průřez %s smazán a nahražen %s') % (cs, newCS) )
         else:
-            for elem in self.elements.itervalues():
+            for elem in self.elements.values():
                 if elem.cs is cs:
                     logger.error( langStr('CrossSection %s is being used by elements %s, deleting canceled','Průřez %s je používán prvky %s, mazání zrušeno') % (cs.label, elem.label) )
                     return 1
@@ -2487,22 +2487,22 @@ class Domain:
             if not newLC:
                 logger.error( langStr('Deleting of load case failed: newLC', 'Mazání zatěžovacího stavu selhalo: newLC') )
                 return 1
-            for load in lc.nodalLoads.itervalues():
+            for load in lc.nodalLoads.values():
                 self.changeNodalLoad(load,loadCase=newLC,isUndoable=isUndoable,masterCommands=commands)
-            for pDspl in lc.prescribedDspls.itervalues():
+            for pDspl in lc.prescribedDspls.values():
                 self.changePrescribedDspl(pDspl,loadCase=newLC,isUndoable=isUndoable,masterCommands=commands)
-            for load in lc.elementLoads.itervalues():
+            for load in lc.elementLoads.values():
                 self.changeElementLoad(load,loadCase=newLC,isUndoable=isUndoable,masterCommands=commands)
             logger.info( langStr('Load case %s deleted and replaced with %s', 'Zatěžovací stav %s smazán a nahražen %s') % (lc, newLC) )
         elif (lc.nodalLoads or lc.elementLoads) and not forced:
             logger.error( langStr('Load case %s not empty, deleting canceled', 'Zatěžovací stav není prázdný, mazání zrušeno') % (lc.label) )
             return 1
         else:
-            for load in lc.nodalLoads.itervalues():
+            for load in lc.nodalLoads.values():
                 self.delNodalLoad(load,isUndoable=isUndoable,masterCommands=commands)
-            for pDspl in lc.prescribedDspls.itervalues():
+            for pDspl in lc.prescribedDspls.values():
                 self.delPrescribedDspl(pDspl,isUndoable=isUndoable,masterCommands=commands)
-            for load in lc.elementLoads.itervalues():
+            for load in lc.elementLoads.values():
                 self.delElementLoad(load,isUndoable=isUndoable,masterCommands=commands)
             if verbose:
                 logger.info( langStr('Load case %s deleted', 'Zatěžovací stav %s smazán') % lc.label )
@@ -2953,7 +2953,7 @@ class Domain:
     def copyElements(self,selection,dx,dy,dz,nc,isUndoable=False,verbose=True,masterCommands=None):
         isUndoable = isUndoable and self.session
         commands = [] if masterCommands is None else masterCommands # for undoable version
-        for icopy in xrange(nc+1):
+        for icopy in range(nc+1):
             processedNodes = []
             # loop over selected objects
             for item in selection:
@@ -3001,15 +3001,15 @@ class Domain:
         self.reset()
         self.delPredefinedItems()
         if typeOfCopy=='shallow':
-            for mat in anotherDomain.materials.itervalues():
+            for mat in anotherDomain.materials.values():
                 self.addMaterial(mat)
-            for cs in anotherDomain.crossSects.itervalues():
+            for cs in anotherDomain.crossSects.values():
                 self.addCrossSect(cs)
-            for node in anotherDomain.nodes.itervalues():
+            for node in anotherDomain.nodes.values():
                 self.addNode(node)
-            for elem in anotherDomain.elements.itervalues():
+            for elem in anotherDomain.elements.values():
                 self.addElement(elem)
-            for lc in anotherDomain.loadCases.itervalues():
+            for lc in anotherDomain.loadCases.values():
                 self.addLoadCase(lc)
         else:
             raise NotImplementedError
@@ -3020,7 +3020,7 @@ class Domain:
         :param Material mat: given material
         :rtype: [Element]
         """
-        return [elem for elem in self.elements.itervalues() if elem.mat is mat]
+        return [elem for elem in self.elements.values() if elem.mat is mat]
 
     def giveElementsWithCS(self,cs):
         """Returns elements possessing given cross section
@@ -3028,7 +3028,7 @@ class Domain:
         :param CrossSection cs: given cross section
         :rtype: [Element]
         """
-        return [elem for elem in self.elements.itervalues() if elem.cs is cs]
+        return [elem for elem in self.elements.values() if elem.cs is cs]
 
     def giveElementsWithNode(self,node):
         """Returns elements possessing given node
@@ -3036,7 +3036,7 @@ class Domain:
         :param Node node: given node
         :rtype: [Element]
         """
-        return [elem for elem in self.elements.itervalues() if node in elem.nodes]
+        return [elem for elem in self.elements.values() if node in elem.nodes]
 
     def giveNodalLoadsOnNode(self,node,onlyActiveLC=False):
         """Returns nodal loads acting on given node
@@ -3054,8 +3054,8 @@ class Domain:
             if not self.activeLoadCase:
                 logger.error( langStr('No active load case, select or create one', 'Nedefinovaný aktivní zatěžovací stav')  )
                 return []
-            return [load for load in self.activeLoadCase.nodalLoads.itervalues() if load.where is node]
-        return [load for lc in self.loadCases.itervalues() for load in lc.nodalLoads.itervalues() if load.where is node]
+            return [load for load in self.activeLoadCase.nodalLoads.values() if load.where is node]
+        return [load for lc in self.loadCases.values() for load in lc.nodalLoads.values() if load.where is node]
 
     def givePrescribedDsplsOnNode(self,node,onlyActiveLC=False):
         """Returns prescribed displacements acting on given node
@@ -3073,8 +3073,8 @@ class Domain:
             if not self.activeLoadCase:
                 logger.error( langStr('No active load case, select or create one', 'Nedefinovaný aktivní zatěžovací stav')  )
                 return []
-            return [pDspl for pDspl in self.activeLoadCase.prescribedDspls.itervalues() if pDspl.where is node]
-        return [pDspl for lc in self.loadCases.itervalues() for pDspl in lc.prescribedDspls.itervalues() if pDspl.where is node]
+            return [pDspl for pDspl in self.activeLoadCase.prescribedDspls.values() if pDspl.where is node]
+        return [pDspl for lc in self.loadCases.values() for pDspl in lc.prescribedDspls.values() if pDspl.where is node]
 
     def giveElementLoadsOnElement(self,element,onlyActiveLC=False):
         """Returns element loads acting on given node
@@ -3091,50 +3091,50 @@ class Domain:
             if not self.activeLoadCase:
                 logger.error( langStr('No active load case, select or create one', 'Nedefinovaný aktivní zatěžovací stav')  )
                 return []
-            return [load for load in self.activeLoadCase.elementLoads.itervalues() if load.where is element]
-        return [load for lc in self.loadCases.itervalues() for load in lc.elementLoads.itervalues() if load.where is element]
+            return [load for load in self.activeLoadCase.elementLoads.values() if load.where is element]
+        return [load for lc in self.loadCases.values() for load in lc.elementLoads.values() if load.where is element]
 
     def giveNodalLoads(self):
         """Returns list of all nodal loads from all load cases
         
         :rtype: [NodalLoad]
         """
-        return [load for lc in self.loadCases.itervalues() for load in lc.nodalLoads.itervalues()]
+        return [load for lc in self.loadCases.values() for load in lc.nodalLoads.values()]
 
     def givePrescribedDspls(self):
         """Returns list of all prescribed displacements from all load cases
         
         :rtype: [PrescribedDisplacement]
         """
-        return [pDspl for lc in self.loadCases.itervalues() for pDspl in lc.prescribedDspls.itervalues()]
+        return [pDspl for lc in self.loadCases.values() for pDspl in lc.prescribedDspls.values()]
 
     def giveElementLoads(self):
         """Returns list of all element loads from all load cases
         
         :rtype: [ElementLoad]
         """
-        return [load for lc in self.loadCases.itervalues() for load in lc.elementLoads.itervalues()]
+        return [load for lc in self.loadCases.values() for load in lc.elementLoads.values()]
 
     def giveLabelsOfNodalLoads(self):
         """Returns list of labels of all nodal loads from all load cases
         
         :rtype: [str]
         """
-        return [key for lc in self.loadCases.itervalues() for key in lc.nodalLoads]
+        return [key for lc in self.loadCases.values() for key in lc.nodalLoads]
 
     def giveLabelsOfPrescribedDspls(self):
         """Returns list of labels of all prescribed displacements from all load cases
         
         :rtype: [str]
         """
-        return [key for lc in self.loadCases.itervalues() for key in lc.prescribedDspls]
+        return [key for lc in self.loadCases.values() for key in lc.prescribedDspls]
 
     def giveLabelsOfElementLoads(self):
         """Returns list of labels of all element loads from all load cases
         
         :rtype: [str]
         """
-        return [key for lc in self.loadCases.itervalues() for key in lc.elementLoads]
+        return [key for lc in self.loadCases.values() for key in lc.elementLoads]
 
     def giveDimsOfBoundingCube(self):
         """computes dimensions of bounding cube (minimal axis aligned cube containing all nodes)
@@ -3167,16 +3167,16 @@ class Domain:
         isUndoable = isUndoable and self.session
         if isUndoable:
             commands = []
-        for lc in self.loadCases.values():
-            for load in lc.nodalLoads.values():
+        for lc in list(self.loadCases.values()):
+            for load in list(lc.nodalLoads.values()):
                 if isUndoable:
                     commands.append(('del',Domain.delNodalLoad,load.dict()))
                 self.delNodalLoad(load,verbose=False)
-            for pDspl in lc.prescribedDspls.values():
+            for pDspl in list(lc.prescribedDspls.values()):
                 if isUndoable:
                     commands.append(('del',Domain.delPrescribedDspl,pDspl.dict()))
                 self.delPrescribedDspl(pDspl,verbose=False)
-            for load in lc.elementLoads.values():
+            for load in list(lc.elementLoads.values()):
                 if isUndoable:
                     commands.append(('del',Domain.delElementLoad,load.dict()))
                 self.delElementLoad(load,verbose=False)
@@ -3184,22 +3184,22 @@ class Domain:
                 commands.append(('del',Domain.delLoadCase,lc.dict()))
             self.delLoadCase(lc,verbose=False,forced=True)
         self.loadCases = {}
-        for elem in self.elements.values():
+        for elem in list(self.elements.values()):
             if isUndoable:
                 commands.append(('del',Domain.delElement,elem.dict()))
             self.delElement(elem,verbose=False)
         self.elements = {}
-        for node in self.nodes.values():
+        for node in list(self.nodes.values()):
             if isUndoable:
                 commands.append(('del',Domain.delNode,node.dict()))
             self.delNode(node,verbose=False)
         self.nodes = {}
-        for mat in self.materials.values():
+        for mat in list(self.materials.values()):
             if isUndoable:
                 commands.append(('del',Domain.delMaterial,mat.dict()))
             self.delMaterial(mat,verbose=False)
         self.materials = {}
-        for cs in self.crossSects.values():
+        for cs in list(self.crossSects.values()):
             if isUndoable:
                 commands.append(('del',Domain.delCrossSect,cs.dict()))
             self.delCrossSect(cs,verbose=False)
@@ -3236,8 +3236,8 @@ class Domain:
         pDspls = kw.get('pDspls')
         if pDspls:
             i = 0
-            for node,val in pDspls.iteritems():
-                if any([float(v) for v in val.itervalues()]): # at least one value is nonzero
+            for node,val in pDspls.items():
+                if any([float(v) for v in val.values()]): # at least one value is nonzero
                     i += 1
                     self.addPrescribedDspl(label='P_%d'%i,where=node,value=val)
 
@@ -3245,7 +3245,7 @@ class Domain:
         """Returns the node at given position, if exist, None otherwise"""
         (x,y,z)=position
         #simple linear search for coincident node
-        for inode in self.nodes.itervalues():
+        for inode in self.nodes.values():
             #check for coincidence, based on coordinate differences, believed to be faster than computing distance
             if ((abs(inode.coords[0]-x)<=tol) and (abs(inode.coords[1]-y)<=tol) and (abs(inode.coords[2]-z)<=tol)):
                 # node at given position already exist
@@ -3270,7 +3270,7 @@ class Domain:
         """Returns the element defined by the given nodes, None otherwise"""
          #simple linear search for duplicated element
         snodes = sorted(nodes)
-        for ielem in self.elements.itervalues():
+        for ielem in self.elements.values():
             #check for coincidence, based on coordinate differences, believed to be faster than computing distance
             #quick check if at least one common node 
             if (ielem.nodes[0] in snodes):
@@ -3384,7 +3384,7 @@ class LinearStaticSolver(Solver):
         if 0:#report output if desired
             fileHandle = open ( 'results.txt', 'w' ) 
             fileHandle.write('Node Location_array(numbers correspond to rows in stiffness matrix)\n')
-            for node in sorted(self.domain.nodes.itervalues(), key=lambda n: natural_key(n.label)):
+            for node in sorted(self.domain.nodes.values(), key=lambda n: natural_key(n.label)):
                 fileHandle.write("%s %s\n"% (node.label, node.loc))
             fileHandle.write('Reduced stiffness matrix\n')
             savetxt(fileHandle, kuu, fmt='%+1.4e', delimiter='   ')
@@ -3425,14 +3425,14 @@ class LinearStaticSolver(Solver):
         locProblems = []
         nodeProblems = []
         MaxDisplacement = 0.
-        for r in self.r.itervalues():
-            for i in xrange(r.shape[0]):
+        for r in self.r.values():
+            for i in range(r.shape[0]):
                 if abs(r[i]) > 1.e+6:
                     locProblems.append(i)
                     if abs(r[i]) > abs(MaxDisplacement):
                         MaxDisplacement = abs(r[i])
         for j in locProblems:
-            for node in self.domain.nodes.itervalues():
+            for node in self.domain.nodes.values():
                 if node.loc.count(j):
                     if node.label not in nodeProblems:
                         nodeProblems.append(node.label)    
@@ -3458,21 +3458,21 @@ class LinearStaticSolver(Solver):
         """TODO
         
         """
-        for lc in self.domain.loadCases.itervalues():
+        for lc in self.domain.loadCases.values():
             flc = self.f[lc.label]
             #substract element loads in reactions
-            for load in lc.elementLoads.itervalues():
+            for load in lc.elementLoads.values():
                 (loc,value) = load.computeLoad(self.domain.type)
                 size = len(loc)
-                for i in xrange(size):
+                for i in range(size):
                     ii = loc[i]
                     if ii>=self.neq:
                         flc[ii] -= value[i]
             #substract nodal load acting in supported DOFs to account direct transfer of those into reaction force
-            for load in lc.nodalLoads.itervalues():
+            for load in lc.nodalLoads.values():
                 (loc, value) = load.computeLoad(self.domain.type)
                 size = len(loc)
-                for i in xrange(size):
+                for i in range(size):
                     ii=loc[i]
                     if ii>=self.neq:
                         flc[ii] -= value[i]
@@ -3484,7 +3484,7 @@ class LinearStaticSolver(Solver):
         :param np.array rp: displacement vector of prescribed DOFs
         """
         self.r = {}
-        for lc in self.domain.loadCases.itervalues():
+        for lc in self.domain.loadCases.values():
             rlc = zeros(self.neq+self.pneq)
             rlc[0:self.neq] = ru[lc.label]
             rlc[self.neq:self.pneq+self.neq] = rp[lc.label]
@@ -3497,7 +3497,7 @@ class LinearStaticSolver(Solver):
         :param np.array fp: load vector of prescribed DOFs
         """
         self.f = {}
-        for lc in self.domain.loadCases.itervalues():
+        for lc in self.domain.loadCases.values():
             flc = zeros(self.neq+self.pneq)
             flc[0:self.neq] = fu[lc.label]
             flc[self.neq:self.pneq+self.neq] = fp[lc.label]
@@ -3509,9 +3509,9 @@ class LinearStaticSolver(Solver):
         :param np.array(2d) kuu: matrix to be checked
         :rtype: bool
         """
-        for i in xrange(kuu.shape[1]):
+        for i in range(kuu.shape[1]):
             if kuu[i,i]<1.e-8:
-                for node in self.domain.nodes.itervalues():
+                for node in self.domain.nodes.values():
                     if node.loc.count(i):
                         break
                 logger.warning( langStr('Stiffness matrix has zero element on diagonal position [%d,%d], check node %s','Matice tuhosti má nulový prvek na pozici diagonály [%d,%d], zkontrolujte uzel %s') % (i,i,node.label) )
@@ -3527,14 +3527,14 @@ class LinearStaticSolver(Solver):
         # TODO
         fu = {}
         fp = {}
-        for lc in self.domain.loadCases.itervalues():
+        for lc in self.domain.loadCases.values():
             fulc = zeros(self.neq)
             fplc = zeros(self.pneq)
             for container in (lc.nodalLoads,lc.elementLoads):
-                for load in container.itervalues():
+                for load in container.values():
                     loc,value = load.computeLoad(self.domain.type)
                     size = len(loc)
-                    for i in xrange(size):
+                    for i in range(size):
                         ii = loc[i]
                         if ii < self.neq:
                             fulc[ii] += value[i]
@@ -3549,14 +3549,14 @@ class LinearStaticSolver(Solver):
         """
         ru = {}
         rp = {}
-        for lc in self.domain.loadCases.itervalues():
+        for lc in self.domain.loadCases.values():
             rulc = zeros(self.neq)
             rplc = zeros(self.pneq)
             #
-            for pDspl in lc.prescribedDspls.itervalues():
+            for pDspl in lc.prescribedDspls.values():
                 loc,value = pDspl.computeLoad(self.domain.type)
                 size = len(loc)
-                for i in xrange(size):
+                for i in range(size):
                     ii = loc[i]
                     if ii >= self.neq:
                         rplc[ii-self.neq] = value[i] # NOT += ???
@@ -3572,21 +3572,21 @@ class LinearStaticSolver(Solver):
         kuu = zeros((self.neq,self.neq))
         kpp = zeros((self.pneq,self.pneq))
         kup = zeros((self.neq,self.pneq))
-        for elem in self.domain.elements.itervalues():
+        for elem in self.domain.elements.values():
             loc = elem.giveLocationArray()
             k = elem.computeStiffness()
             size=len(loc)
-            for i in xrange(size):
+            for i in range(size):
                 ii = loc[i]
                 if ii<self.neq:
-                    for j in xrange(size):
+                    for j in range(size):
                         jj = loc[j]
                         if jj<self.neq:
                             kuu[ii,jj] += k[i,j]
                         else:
                             kup[ii,jj-self.neq] += k[i,j]
                 else:   #ii>=neq prescribed row
-                    for j in xrange(size):
+                    for j in range(size):
                         jj = loc[j]
                         if jj>=self.neq:
                             kpp[ii-self.neq,jj-self.neq] += k[i,j]
@@ -3596,7 +3596,7 @@ class LinearStaticSolver(Solver):
         self.neq = 0
         self.pneq = 0
         # loop over nodes and count equations
-        for node in self.domain.nodes.itervalues():
+        for node in self.domain.nodes.values():
             for idof in self.domain.dofsNames:
                 if node.hasPrescribedBcInDof(idof): # active support
                     self.pneq += 1
@@ -3605,7 +3605,7 @@ class LinearStaticSolver(Solver):
         #assign code numbers in 2nd pass
         ineq = 0 # unknowns numbering starts from 0..neq-1
         ipneq = self.neq #prescribed unknowns numbering starts neq..neq+pneq-1
-        for node in self.domain.nodes.itervalues():
+        for node in self.domain.nodes.values():
             nodeLoc = []
             for idof in self.domain.dofsNames:
                 if node.hasPrescribedBcInDof(idof): # support
@@ -3617,8 +3617,8 @@ class LinearStaticSolver(Solver):
             node.loc = nodeLoc
         logger.info( langStr('Number of equations (unknowns): %d\nNumber of prescribed DOFs: %d','Počet rovnic (neznámých): %d\nPočet předepsaných stupňů volnosti: %d') % (self.neq, self.pneq) )
         # node names
-        self.dofNames = dict( (i,'') for i in xrange(self.neq+self.pneq) )
-        for node in self.domain.nodes.itervalues():
+        self.dofNames = dict( (i,'') for i in range(self.neq+self.pneq) )
+        for node in self.domain.nodes.values():
             self.dofNames[node.loc[0]] = node.label+'_x'
             self.dofNames[node.loc[1]] = node.label+'_z'
             self.dofNames[node.loc[2]] = node.label+'_Y'
@@ -3704,7 +3704,7 @@ class LinearStabilitySolver(Solver):
         :param np.array rp: displacement vector of prescribed DOFs
         """
         self.r = {}
-        for lc in self.domain.loadCases.itervalues():
+        for lc in self.domain.loadCases.values():
             rlc = zeros(self.neq+self.pneq)
             rlc[0:self.neq] = ru[lc.label]
             rlc[self.neq:self.pneq+self.neq] = rp[lc.label]
@@ -3721,7 +3721,7 @@ class LinearStabilitySolver(Solver):
         _init = True
         minn = 0.0 # minn will be set to the first nonzero normal force; this is to handle the case when all normal forces are zero.
         elemn=[] # element nodal forces
-        for elem in self.domain.elements.itervalues():
+        for elem in self.domain.elements.values():
             # compute average normal force on element
             nn = elem.computeNormalForce(self.linsolver.r[session.domain.activeLoadCase.label])
             n = 0.5*(nn[0]-nn[1]) # take an average value
@@ -3737,7 +3737,7 @@ class LinearStabilitySolver(Solver):
             raise ValueError(langStr('Linear Stability: problem may be ill-posed (zero normal forces)\n', 'Problém může být špatně podmíněný (nulové normálové síly\n'))
         
         _i=0
-        for elem in self.domain.elements.itervalues():
+        for elem in self.domain.elements.values():
             loc = elem.giveLocationArray()
             n = elemn[_i] # take cached value
             _i = _i+1 
@@ -3747,10 +3747,10 @@ class LinearStabilitySolver(Solver):
             # print "n=", n
             k = elem.computeInitialStressMatrix(N=n)
             size=len(loc)
-            for i in xrange(size):
+            for i in range(size):
                 ii = loc[i]
                 if ii<neq:
-                    for j in xrange(size):
+                    for j in range(size):
                         jj = loc[j]
                         if jj<neq:
                             ks_uu[ii,jj] += k[i,j]

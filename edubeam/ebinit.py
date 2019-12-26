@@ -44,10 +44,10 @@ import copy
 import importlib
 
 """current version"""
-version = '3.5.0'
+version = '4.0.0'
 
 """date of last modification"""
-date = '2017-01-13'
+date = '2019-12-26'
 #ebdir = sys.path[0]
 #Use for PyInstaller to have access to splash screen
 if getattr(sys, 'frozen', None):
@@ -250,7 +250,8 @@ class Logger:
         if level < self.level:
             return
         name = self.logLevelInt2str.get(level)
-        msg = '%s%s'%('%s: '%name if self.printMsgType else '', smart_str(msg))
+        #print(type(name))
+        msg = '%s%s'%('%s: '%name if self.printMsgType else '', smart_str(msg).decode("utf-8"))
         print (msg)
         if self.file:
             self.file.write(msg + '\n')
