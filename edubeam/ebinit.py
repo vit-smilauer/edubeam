@@ -143,7 +143,7 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
 
 
 def description():
-    return langStr('EduBeam is an education project to develop a free structural analysis code','EduBeam je výukový projekt, jehož cílem je vývoj volně šiřitelného programu pro analýzu konstrukcí')
+    return langStr('EduBeam is an educational project to develop a free structural analysis code','EduBeam je výukový projekt, jehož cílem je vývoj volně šiřitelného programu pro analýzu konstrukcí')
 
 
 licence = '''EduBeam is free software; you can redistribute it and/or modify it 

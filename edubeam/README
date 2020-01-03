@@ -1,0 +1,74 @@
+
+
+  EduBeam: Educational project for structural analysis of beams and frames
+                    Copyright (C) 2010 - 2014 Borek Patzak
+
+         Czech Technical University, Faculty of Civil Engineering,
+     Department of Structural Mechanics, 166 29 Prague, Czech Republic
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+===============================================================================
+
+CONTENTS:
+[1] Description
+[2] Authors
+[3] What is here
+[4] Pre-requisites
+[5] Running EduBeam examples
+
+
+[1] Description
+===============================================================================
+EduBeam is an educational project to develop a simple, open source structural 
+analysis code for beams and frames.
+
+[2] Authors
+===============================================================================
+The following people have contributed to EduBeam development.
+
+Borek Patzak (original author, lead developer)
+Jan Stransky (element loadings, windows installation)
+Vit Smilauer 
+
+[3] What is here
+===============================================================================
+The directory tree below holds source code to the EduBeam package. 
+
+EduBeam_TOP_DIR - contains source code of the EduBeam package
+|
+|-- examples - contains examples and tests
+
+[4] Pre-requisites
+===============================================================================
+The EduBeam requires the python3 interpreter. The following libraries work 
+on Linux (some downloaded directly, rather than via pip or package manager):
+PyOpenGL (3.1.0)
+numpy (1.15.1)
+wxPython (4.0.1)
+minidom
+
+[5] Running EduBeam examples
+===============================================================================
+Just open (In main menu follow File->Open) one of the example files provided.
+
+Bugs
+==============================================================================
+
+Please mail all bug reports and suggestions to [info@oofem.org]. I will try to
+give satisfaction, if the time is at least partially on my side. 
+
+
+                                Enjoy
+                                        Borek Patzak
