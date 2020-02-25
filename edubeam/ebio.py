@@ -31,7 +31,7 @@
 EduBeam module providing input/output functionality
 """
 
-from ebinit import version, EduBeamError, logger
+from ebinit import version, EduBeamError, logger, langStr
 import os
 import sys
 

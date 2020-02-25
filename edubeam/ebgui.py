@@ -1519,7 +1519,7 @@ class GLFrame(wx.Frame):
         if fileName == os.path.basename(fileName):
             fileName = os.path.join(os.getcwd(),fileName)
         try:
-            execfile(fileName)
+            exec(open(fileName).read())
         except Exception as err:
             print ("External file %s exception:" %fileName)
             print (err)

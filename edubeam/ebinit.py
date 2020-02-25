@@ -101,11 +101,11 @@ def langStr(*arg):
     if lArg==0: return ''
     if lArg==1:
         if isinstance(arg[0],dict):
-            return unicode(arg[0][eblang], 'utf-8')
+            return str(arg[0][eblang], 'utf-8')
         if isinstance(arg[0],list):
-            return unicode(arg[0][0], 'utf-8') if eblang=='en' else unicode(arg[0][1], 'utf-8') if eblang=='cz' else ''
+            return str(arg[0][0], 'utf-8') if eblang=='en' else str(arg[0][1], 'utf-8') if eblang=='cz' else ''
         if isinstance(arg[0],str):
-            return unicode(arg[0], 'utf-8')
+            return str(arg[0], 'utf-8')
     else:
         return arg[0] if eblang=='en' else arg[1] if eblang=='cz' else ''
     return ''
@@ -119,7 +119,7 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     
     :rtype: str
     """
-    if strings_only and isinstance(s, (types.NoneType, int)):
+    if strings_only and (isinstance(s, int) or s is None):
         return s
     if not isinstance(s, str):
         try:
@@ -131,7 +131,7 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
                 # further exception.
                 return ' '.join([smart_str(arg, encoding, strings_only,
                         errors) for arg in s])
-            return unicode(s).encode(encoding, errors)
+            return str(s).encode(encoding, errors)
     elif isinstance(s, str):
         return s.encode(encoding, errors)
     elif s and encoding != 'utf-8':
