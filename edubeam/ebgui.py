@@ -1738,30 +1738,30 @@ class GLFrame(wx.Frame):
 
 
     def hilitSelection (self, selection):
-       backup_node_color = globalSettings.nodeColor
-       globalSettings.nodeColor =  globalSettings.hilitColor
-       backup_elem_color = globalSettings.elemColor
-       globalSettings.elemColor = globalSettings.hilitColor
-       #
-       if selection != [None]:
-          for i in selection:
-              i.OnDraw()
-       #
-       globalSettings.nodeColor =  backup_node_color
-       globalSettings.elemColor =  backup_elem_color
+        backup_node_color = globalSettings.nodeColor
+        globalSettings.nodeColor =  globalSettings.hilitColor
+        backup_elem_color = globalSettings.elemColor
+        globalSettings.elemColor = globalSettings.hilitColor
+        #
+        if selection != [None]:
+            for i in selection:
+                i.OnDraw()
+        #
+        globalSettings.nodeColor =  backup_node_color
+        globalSettings.elemColor =  backup_elem_color
 
     def onMouseLeft_selection (self, event):
-       x, y = event.GetPosition()
-       vc = projectCoordinates(x, y)
-       if event.LeftDown():
-          self.selectionbbox_initvc = vc
-          return
-       elif event.LeftUp():
-          bbox = BBox(self.selectionbbox_initvc,vc,self.selectionMode)
-          #self.selection=[]
-          self.createSelection(bbox)
-          return
-       return
+        x, y = event.GetPosition()
+        vc = projectCoordinates(x, y)
+        if event.LeftDown():
+            self.selectionbbox_initvc = vc
+            return
+        elif event.LeftUp():
+            bbox = BBox(self.selectionbbox_initvc, vc)
+            # self.selection=[]
+            self.createSelection(bbox, self.selectionMode)
+            return
+        return
 
 
 

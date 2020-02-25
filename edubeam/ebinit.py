@@ -357,16 +357,16 @@ doNotUseExtensions = False
 outputFileName = ''
 logLevel = 'INFO'
 pythonScriptFileName =''
-for i,arg in enumerate(sys.argv):
+for idx,arg in enumerate(sys.argv):
     a = arg.lower()
-    if   a == '-l' or a == '--lang':       eblang = sys.argv[i+1]
-    elif a == '-f' or a == '--file':       fileName = sys.argv[i+1]
+    if   a == '-l' or a == '--lang':       eblang = sys.argv[idx+1]
+    elif a == '-f' or a == '--file':       fileName = sys.argv[idx+1]
     elif a == '-t' or a == '--term':       redirectTerm = False
     elif a == '-b' or a == '--basic':      doNotUseExtensions = True
-    elif a == '-o' or a == '--output':     outputFileName = sys.argv[i+1]
+    elif a == '-o' or a == '--output':     outputFileName = sys.argv[idx+1]
     elif a == '-d' or a == '--debug':      logLevel = 'DEBUG'
-    elif a == '--loglevel':                logLevel = sys.argv[i+1]
-    elif a == '-e' or a == '--execute':    pythonScriptFileName = sys.argv[i+1]
+    elif a == '--loglevel':                logLevel = sys.argv[idx+1]
+    elif a == '-e' or a == '--execute':    pythonScriptFileName = sys.argv[idx+1]
     
 if not eblang in supportedLangs:
     eblang = defaultLang
