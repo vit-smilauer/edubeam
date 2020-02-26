@@ -740,10 +740,10 @@ class GLFrame(wx.Frame):
         #
         menuBar.Append(solvemenu, langStr('&Solve', '&Výpočet')) # Adding the 'Solve' to the MenuBar
         #
-        help = wx.Menu()
-        menuitem = help.Append(wx.ID_ABOUT, langStr('&About', '&O aplikaci'))
+        help_menu = wx.Menu()
+        menuitem = help_menu.Append(wx.ID_ABOUT, langStr('&About', '&O aplikaci'))
         self.Bind(wx.EVT_MENU, self.OnAboutBox, menuitem)
-        menuBar.Append(help, langStr('&Help','&Nápověda'))# Adding the 'help menu' to the MenuBar
+        menuBar.Append(help_menu, langStr('&Help','&Nápověda'))# Adding the 'help_menu menu' to the MenuBar
         #
         self.SetMenuBar(menuBar)  # Adding the MenuBar to the Frame content.
         
@@ -972,8 +972,8 @@ class GLFrame(wx.Frame):
                 self.mouseMoveCB(vc)
         elif event.ShiftDown() and event.Dragging():
             # zooming
-            dir = y-self.lastmousexy[1]
-            if dir>0:
+            loc_dir = y-self.lastmousexy[1]
+            if loc_dir>0:
                 self.zoomIn()
             else:
                 self.zoomOut()
@@ -1549,13 +1549,13 @@ class GLFrame(wx.Frame):
     
     def openFileMenu(self, event):
         wcd = langStr('Xml files (*.xml)|*.xml;*.XML;*.Xml|Oofem files (*.oofem)|*.oofem;*.OOFEM;*.Oofem|All files (*)|*', 'Xml soubory (*.xml)|*.xml;*.XML;*.Xml|Oofem soubory (*.oofem)|*.oofem;*.OOFEM;*.Oofem|Všechny soubory (*)|*')
-        dir = os.getcwd()
-        open_dlg = wx.FileDialog(self, message=langStr('Choose a file', 'Vyber soubor'), defaultDir=dir, defaultFile='',
+        loc_dir = os.getcwd()
+        open_dlg = wx.FileDialog(self, message=langStr('Choose a file', 'Vyber soubor'), defaultDir=loc_dir, defaultFile='',
                                  wildcard=wcd, style=wx.FD_OPEN|wx.FD_CHANGE_DIR)
         if open_dlg.ShowModal() == wx.ID_OK:
-            path = open_dlg.GetPath()
+            loc_path = open_dlg.GetPath()
             try:
-                self.openFile(path)
+                self.openFile(loc_path)
             except IOError as error:
                 dlg = wx.MessageDialog(self, langStr('Error opening file\n', 'Chyba při otvírání souboru\n') + str(error))
                 dlg.ShowModal()
@@ -1579,29 +1579,29 @@ class GLFrame(wx.Frame):
 
     def saveFileAsMenu(self, event):
         wcd = langStr('Xml files (*.xml)|*.xml;*.XML;*.Xml|Oofem files (*.oofem)|*.oofem;*.OOFEM;*.Oofem|All files (*)|*', 'Xml soubory (*.xml)|*.xml;*.XML;*.Xml|Oofem soubory (*.oofem)|*.oofem;*.OOFEM;*.Oofem|Všechny soubory (*)|*')
-        dir = os.getcwd()
-        open_dlg = wx.FileDialog(self, message=langStr('Enter a file for saving', 'Zadej soubor pro uložení'), defaultDir=dir, defaultFile='',
+        loc_dir = os.getcwd()
+        open_dlg = wx.FileDialog(self, message=langStr('Enter a file for saving', 'Zadej soubor pro uložení'), defaultDir=loc_dir, defaultFile='',
                                  wildcard=wcd, style=wx.FD_SAVE|wx.FD_CHANGE_DIR)
         if open_dlg.ShowModal() == wx.ID_OK:
-            path = open_dlg.GetPath()
+            loc_path = open_dlg.GetPath()
             if open_dlg.GetFilterIndex() == 0: # chosen xml
-                pl = path.lower()
+                pl = loc_path.lower()
                 if not pl.endswith('.xml'):
-                    path += ".xml" # append .xml if missing
+                    loc_path += ".xml" # append .xml if missing
             elif open_dlg.GetFilterIndex() == 1: # chosen oofem
-                pl = path.lower()
+                pl = loc_path.lower()
                 if not pl.endswith('.oofem'):
-                    path += ".oofem" # append .oofem if missing
-            if os.path.isfile(path): # if the file already exists
-                dlg = wx.MessageDialog(self, langStr('File %s already exists. Overwrite?\n', 'Soubor %s již existuje. Přepsat?\n') % path, style=wx.YES_NO)
+                    loc_path += ".oofem" # append .oofem if missing
+            if os.path.isfile(loc_path): # if the file already exists
+                dlg = wx.MessageDialog(self, langStr('File %s already exists. Overwrite?\n', 'Soubor %s již existuje. Přepsat?\n') % loc_path, style=wx.YES_NO)
                 if dlg.ShowModal() == wx.ID_NO:
                     return
                 dlg.Destroy()
-            if session.save(path):
+            if session.save(loc_path):
                 dlg = wx.MessageDialog(self, langStr('Error saving file\n', 'Chyba při ukládání souboru\n') + str(error))
                 dlg.ShowModal()
                 return True
-            self.fullFileName = path
+            self.fullFileName = loc_path
             self.sb.SetStatusText('')
             self.modify = False
             self.canvas.Refresh(False)
@@ -1611,13 +1611,13 @@ class GLFrame(wx.Frame):
     
     def exportGraphics(self, event):
         wcd = langStr('png files (*.png)|*.png|All files (*)|*', 'png soubory (*.png)|*.png|Všechny soubory (*)|*')
-        dir = os.getcwd()
-        open_dlg = wx.FileDialog(self, message=langStr('Choose a file', 'Vyber soubor'), defaultDir=dir, defaultFile='',
+        loc_dir = os.getcwd()
+        open_dlg = wx.FileDialog(self, message=langStr('Choose a file', 'Vyber soubor'), defaultDir=loc_dir, defaultFile='',
                                  wildcard=wcd, style=wx.FD_SAVE|wx.FD_CHANGE_DIR)
         if open_dlg.ShowModal() == wx.ID_OK:
-            path = open_dlg.GetPath()
-            if not path.endswith('.png'):
-                path += '.png'
+            loc_path = open_dlg.GetPath()
+            if not loc_path.endswith('.png'):
+                loc_path += '.png'
 
             self.canvas.Refresh(False)
             size = self.getGLExtents()
@@ -1628,7 +1628,7 @@ class GLFrame(wx.Frame):
             img.SetData( pixels )
             img = img.Mirror(False)
             try:
-                img.SaveFile(path, wx.BITMAP_TYPE_PNG)
+                img.SaveFile(loc_path, wx.BITMAP_TYPE_PNG)
             except IOError as error:
                 dlg = wx.MessageDialog(self, langStr('Error opening file\n', 'Chyba při otvírání souboru\n') + str(error))
                 dlg.ShowModal()
@@ -4866,31 +4866,31 @@ class Notebook(wx.Frame):
             wcd = langStr('Xls files (*.xls)|*.xls;*.XLS;*.Xls|Csv files (*.csv)|*.csv;*.CSV;*.Csv|All files (*)|*', 'Xls soubory (*.xls)|*.xls;*.XLS;*.Xls|Csv soubory (*.csv)|*.csv;*.CSV;*.Csv|Všechny soubory (*)|*')
         else:
             wcd = langStr('Csv files (*.csv)|*.csv;*.CSV;*.Csv|All files (*)|*', 'Csv soubory (*.csv)|*.csv;*.CSV;*.Csv|Všechny soubory (*)|*')
-        dir = os.getcwd()
-        open_dlg = wx.FileDialog(self, message=langStr('Enter a file for saving', 'Zadej soubor pro uložení'), defaultDir=dir, defaultFile='',
+        loc_dir = os.getcwd()
+        open_dlg = wx.FileDialog(self, message=langStr('Enter a file for saving', 'Zadej soubor pro uložení'), defaultDir=loc_dir, defaultFile='',
                                  wildcard=wcd, style=wx.FD_SAVE|wx.FD_CHANGE_DIR)
         if open_dlg.ShowModal() == wx.ID_OK:
-            path = open_dlg.GetPath()
+            loc_path = open_dlg.GetPath()
             if open_dlg.GetFilterIndex() == 0:
-                pl = path.lower()
+                pl = loc_path.lower()
                 if not (pl.endswith('.xls') or pl.endswith('.csv')):
-                    path += ('.xls' if 'xls' in sheetExportFormats else '.csv')
-                pl = path.lower()
+                    loc_path += ('.xls' if 'xls' in sheetExportFormats else '.csv')
+                pl = loc_path.lower()
                 fFormat = 'xls' if pl.endswith('.xls') else 'csv' if pl.endswith('.csv') else None
-            if os.path.isfile(path):#if the file already exists
-                dlg = wx.MessageDialog(self, langStr('File %s already exists. Overwrite?\n', 'Soubor %s již existuje. Přepsat?\n') % path, style=wx.YES_NO)
+            if os.path.isfile(loc_path):#if the file already exists
+                dlg = wx.MessageDialog(self, langStr('File %s already exists. Overwrite?\n', 'Soubor %s již existuje. Přepsat?\n') % loc_path, style=wx.YES_NO)
                 if dlg.ShowModal() == wx.ID_NO:
                     return
                 dlg.Destroy()
             try:
-                with open(path, 'wb') as file:
+                with open(loc_path, 'wb') as file:
                     self.save(file, fFormat)
                     file.close()
             except (IOError,EduBeamError) as error:
                 dlg = wx.MessageDialog(self, langStr('Error saving file\n', 'Chyba při ukládání souboru\n') + str(error))
                 dlg.ShowModal()
                 return
-            logger.info( langStr('Table successfully saved to file %s','Tabulka úspěšně uložena do souboru %s') % (str(path)) )
+            logger.info( langStr('Table successfully saved to file %s','Tabulka úspěšně uložena do souboru %s') % (str(loc_path)) )
         open_dlg.Destroy()
 
 

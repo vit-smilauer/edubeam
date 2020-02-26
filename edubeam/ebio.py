@@ -581,7 +581,7 @@ class OofemFileWriter(FileWriter):
 
 class OofemFileReader(FileReader):
     """File writer for 2d beam structures into OOFEM input file"""
-    def readLine(self):
+    def readLine(self,splitStr=None):  # TODO check why splitStr is not used here
         self.line = self.file.readline().lower()
         while self.line.lstrip().startswith('#'):
             self.line = self.file.readline().lower()
@@ -605,7 +605,7 @@ class OofemFileReader(FileReader):
     def readStr(self,string,default=None):
         return self.readWord(string,str,default)
 
-    def readWordArray(self,string,type,default=None):
+    def readWordArray(self, string, type, default=None):  # TODO solve built-in name type
         for i,word in enumerate(self.lineSplit):
             if word == string:
                 l = int(self.lineSplit[i+1])

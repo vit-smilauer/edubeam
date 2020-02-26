@@ -589,6 +589,14 @@ class Element:
     def __str__(self):
         return self.label
 
+    def dict(self):
+        """
+        returns dictionary of attributes saved to xml file
+
+        :rtype: dict
+        """
+        return dict(label=self.label, nodes=[n.label for n in self.nodes], mat=self.mat.label, cs=self.cs.label, domain=self.domain.label if self.domain else '')
+
 
 class Beam2d(Element):
     """A class representing 2D beam Element
@@ -2769,7 +2777,7 @@ class Domain:
         commands = [] if masterCommands is None else masterCommands # for undoable version
         # loop over selected objects
         for elem in elems:
-            if self.changeElement(node,mat=mat,cs=cs,hinges=hinges,isUndoable=isUndoable,masterCommands=commands):
+            if self.changeElement(elem,mat=mat,cs=cs,hinges=hinges,isUndoable=isUndoable,masterCommands=commands):
                 # changing failed
                 return 1
         if isUndoable and masterCommands is None:
