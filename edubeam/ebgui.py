@@ -5040,7 +5040,7 @@ class ColorSetupBox(wx.Panel):
         return rgb
    
     def OnDefault(self, event):
-        for color in defaultGlobalSettings.iterkeys():
+        for color in defaultGlobalSettings.keys():
             if color in colorsInDefaultSetup:
                 globalSettings[color] = defaultGlobalSettings[color]
         self.nodecolorBtn.SetBackgroundColour([c*255. for c in globalSettings.nodeColor])

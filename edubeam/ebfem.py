@@ -46,7 +46,7 @@ def keyExists(instances, key):
     if isinstance(instances, dict):
         instances = (instances,)
     for dictionary in instances:
-        for label in dictionary.iterkeys():
+        for label in dictionary.keys():
             if label == key:
                 return 1
     return 0
@@ -67,7 +67,7 @@ def giveNewLabel(instances, flag=''):
             if isinstance(instances, dict):
                 instances = (instances,)
             for dictionary in instances:
-                for label in dictionary.iterkeys():
+                for label in dictionary.keys():
                     m = re.match(r".*?([0-9]+)", label) # match the longest number at the end
                     if m:
                         n = m.group(1)
@@ -392,7 +392,7 @@ class Node:
         :param int|str dof: degree of freedom to be named
         :rtype: str
         """
-        if isinstance(dof,(str,unicode)):
+        if isinstance(dof,(str)):
             if dof=='x': return 'x'
             if dof=='y': return 'y'
             if dof=='z': return 'z'
@@ -474,7 +474,7 @@ class Element:
         for node in nodes:
             if isinstance(node,Node):
                 ret.append(node)
-            elif isinstance(node,(str,unicode)):
+            elif isinstance(node,(str)):
                 if not self.domain:
                     logger.error( langStr('No domain to get node by string label from ...','Žádná síť, z které by mohl být uzel získán na základě názvu ...') )
                     return None
@@ -501,7 +501,7 @@ class Element:
             return None
         if isinstance(mat,Material):
             return mat
-        if isinstance(mat,(str,unicode)):
+        if isinstance(mat,(str)):
             if not self.domain:
                 logger.error( langStr('No domain to get material by string label from ...','Žádná síť, z které by mohl být materiál získán na základě názvu ...') )
                 return None
@@ -525,7 +525,7 @@ class Element:
             return None
         if isinstance(cs,CrossSection):
             return cs
-        if isinstance(cs,(str,unicode)):
+        if isinstance(cs,(str)):
             if not self.domain:
                 logger.error( langStr('No domain to get cross section by string label from ...','Žádná síť, z které by mohl být průřez získán na základě názvu ...') )
                 return None
@@ -1348,7 +1348,7 @@ class GeneralBoundaryCondition:
             return None
         if isinstance(where,Element):
             return where
-        if isinstance(where,(str,unicode)):
+        if isinstance(where,(str)):
             if not (self.loadCase and self.loadCase.domain):
                 logger.error( langStr('No domain to get element load by string label from ...','Žádná síť, z které by mohlo být prvkové zatížení získáno na základě názvu ...') )
                 return None
@@ -1371,7 +1371,7 @@ class GeneralBoundaryCondition:
             return None
         if isinstance(where,Node):
             return where
-        if isinstance(where,(str,unicode)):
+        if isinstance(where,(str)):
             if not (self.loadCase and self.loadCase.domain):
                 logger.error( langStr('No domain to get nodal load by string label from ...','Žádná síť, z které by mohlo být uzlové zatížení získáno na základě názvu ...') )
                 return None
@@ -1394,7 +1394,7 @@ class GeneralBoundaryCondition:
             return None
         if isinstance(loadCase,LoadCase):
             return loadCase
-        if isinstance(loadCase,(str,unicode)):
+        if isinstance(loadCase,(str)):
             if not (self.loadCase and self.loadCase.domain):
                 logger.error( langStr('No domain to get load case by string label from ...','Žádná síť, z které by mohl být zatěžovací stav získán na základě názvu ...') )
                 return None
@@ -1873,7 +1873,8 @@ class Domain:
         :param str|Material mat: given material to be returned
         :rtype: Material | None
         """
-        if isinstance(mat,(str,unicode)):
+        #if isinstance(mat,(str)):
+        if isinstance(mat,str):
             label = mat
             mat = self.materials.get(label)
             if not mat:
@@ -1889,7 +1890,8 @@ class Domain:
         :param str|CrossSection cs: given cross section to be returned
         :rtype: CrossSection | None
         """
-        if isinstance(cs,(str,unicode)):
+        #if isinstance(cs,(str)):
+        if isinstance(cs,str):
             label = cs
             cs = self.crossSects.get(label)
             if not cs:
@@ -1905,7 +1907,7 @@ class Domain:
         :param str|Node node: given node to be returned
         :rtype: Node | None
         """
-        if isinstance(node,(str,unicode)):
+        if isinstance(node,(str)):
             label = node
             node = self.nodes.get(label)
             if not node:
@@ -1921,7 +1923,7 @@ class Domain:
         :param str|Element elem: given element to be returned
         :rtype: Element | None
         """
-        if isinstance(elem,(str,unicode)):
+        if isinstance(elem,(str)):
             label = elem
             elem = self.elements.get(label)
             if not elem:
@@ -1937,7 +1939,8 @@ class Domain:
         :param str|LoadCase lc: given load case to be returned
         :rtype: LoadCase | None
         """
-        if isinstance(lc,(str,unicode)):
+        #if isinstance(lc,(str)):
+        if isinstance(lc,str):
             label = lc
             lc = self.loadCases.get(label)
             if not lc:
@@ -1953,7 +1956,8 @@ class Domain:
         :param str|NodalLoad load: given nodal load to be returned
         :rtype: NodalLoad | None
         """
-        if isinstance(load,(str,unicode)):
+        #if isinstance(load,(str)):
+        if isinstance(load,str):            
             for lc in self.loadCases.values():
                 if load in lc.nodalLoads:
                     break
@@ -1972,7 +1976,8 @@ class Domain:
         :param str|PrescribedDisplacement pDspl: given prescribed displacement to be returned
         :rtype: NodalLoad | None
         """
-        if isinstance(pDspl,(str,unicode)):
+        #if isinstance(pDspl,(str)):
+        if isinstance(pDspl,str):            
             for lc in self.loadCases.values():
                 if pDspl in lc.prescribedDspls:
                     break
@@ -1991,7 +1996,8 @@ class Domain:
         :param str|ElementLoad load: given element load to be returned
         :rtype: ElementLoad | None
         """
-        if isinstance(load,(str,unicode)):
+        #if isinstance(load,(str)):
+        if isinstance(load,str):            
             for lc in self.loadCases.values():
                 if load in lc.elementLoads:
                     break
@@ -2186,7 +2192,8 @@ class Domain:
             loadCase = self.activeLoadCase
         if isinstance(loadCase,LoadCase):
             pass
-        elif isinstance(loadCase,(str,unicode)):
+        #elif isinstance(loadCase,(str)):
+        elif isinstance(loadCase,str):            
             loadCase = self.loadCases.get(loadCase)
             if not loadCase:
                 logger.error( langStr('LoadCase not found in %s', 'Zatěžovací stav nenalezen v %s') % (sorted(self.loadCases.keys())) )
@@ -2231,7 +2238,8 @@ class Domain:
             loadCase = self.activeLoadCase
         if isinstance(loadCase,LoadCase):
             pass
-        elif isinstance(loadCase,(str,unicode)):
+        #elif isinstance(loadCase,(str)):
+        elif isinstance(loadCase,str):            
             loadCase = self.loadCases.get(loadCase)
             if not loadCase:
                 logger.error( langStr('LoadCase not found in %s', 'Zatěžovací stav nenalezen v %s') % (sorted(self.loadCases.keys())) )
@@ -2276,7 +2284,8 @@ class Domain:
             loadCase = self.activeLoadCase
         if isinstance(loadCase,LoadCase):
             pass
-        elif isinstance(loadCase,(str,unicode)):
+        #elif isinstance(loadCase,(str)):
+        elif isinstance(loadCase,str):            
             loadCase = self.loadCases.get(loadCase)
             if not loadCase:
                 logger.error( langStr('LoadCase not found in %s', 'Zatěžovací stav nenalezen v %s') % (sorted(self.loadCases.keys())) )
@@ -3053,7 +3062,8 @@ class Domain:
         :param bool onlyActiveLC: if True, loads only from self.activeLoadCase are retrned
         :rtype: [NodalLoad]
         """
-        if isinstance(node,(str,unicode)):
+        #if isinstance(node,(str)):
+        if isinstance(node,str):            
             node = self.nodes.get(node)
             if not node:
                 log.error( langStr('Wrong node','Špatný uzel') )
@@ -3072,7 +3082,7 @@ class Domain:
         :param bool onlyActiveLC: if True, pDspls only from self.activeLoadCase are retrned
         :rtype: [NodalLoad]
         """
-        if isinstance(node,(str,unicode)):
+        if isinstance(node,(str)):
             node = self.nodes.get(node)
             if not node:
                 log.error( langStr('Wrong node','Špatný uzel') )
