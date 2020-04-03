@@ -4085,8 +4085,12 @@ class LinearStaticPostProcessBox(wx.Panel):
             kw['elem'] = self.combo2.GetValue()
         self.spreadSheet.importData(dataType,**kw)
         self.spreadSheet.Bind(wx.EVT_CLOSE, self.ResultsToSpreadsheetClose)
-        self.spreadSheet.Show(True)
-        self.spreadSheet.Centre()
+        #self.spreadSheet.SetFocus()
+        #self.spreadSheet.Refresh()
+        #self.spreadSheet.Update()
+        #self.spreadSheet.Centre()
+        self.spreadSheet.Show()
+        
 
     def ResultsToSpreadsheetClose(self, event=None):
         self.spreadSheet.Destroy()
@@ -4680,14 +4684,15 @@ class Notebook(wx.Frame):
         wx.Frame.__init__(self, parent, id, title, size=(1200, 500))
         menubar = wx.MenuBar()
         file = wx.Menu()
-        file.Append(101, langStr('&Quit', '&Zavřít')+'\tCtrl+Q', '' )
-        file.Append(102, langStr('&Save as', '&Uložit jako')+'\tCtrl+Shift+S', '' )
+        quit = file.Append(wx.ID_EXIT, langStr('&Quit', '&Zavřít')+'\tCtrl+Q', '' )
+        saveas = file.Append(wx.ID_SAVE, langStr('&Save as', '&Uložit jako')+'\tCtrl+Shift+S', '' )
         menubar.Append(file, langStr('&File', '&Soubor'))
         self.SetMenuBar(menubar)
-        wx.EVT_MENU(self, 101, parent.ResultsToSpreadsheetClose)
-        wx.EVT_MENU(self, 102, self.saveFileAsMenu)
+        self.Bind(wx.EVT_MENU, parent.ResultsToSpreadsheetClose, quit)
+        self.Bind(wx.EVT_MENU, self.saveFileAsMenu, saveas)
         self.nb = wx.Notebook(self, -1, style=wx.NB_BOTTOM)
         self.StatusBar()
+        self.Show()#must be called here, otherwise does not not show
         #self.Nodes.Bind(wx.EVT_KEY_DOWN, self.OnKey)
         #self.Elements.Bind(wx.EVT_KEY_DOWN, self.OnKey)
     
